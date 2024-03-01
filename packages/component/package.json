@@ -14,11 +14,11 @@
   "scripts": {
     "tsc": "tsc --project tsconfig.build.json",
     "less": "lessc src/css/index.less src/css/index.css",
-    "clean": "rimraf dist; rimraf es; rimraf lib;",
+    "clean": "rimraf dist && rimraf es && rimraf lib",
     "build": "father build",
-    "build:cjs": "BABEL_ENV=cjs babel src --root-mode upward --out-dir lib --source-maps --extensions .ts,.tsx --delete-dir-on-start --no-comments",
-    "build:esm": "BABEL_ENV=esm babel src --root-mode upward --out-dir es --source-maps --extensions .ts,.tsx --delete-dir-on-start --no-comments",
-    "watch": "BABEL_ENV=cjs babel src --watch --root-mode upward --out-dir lib --source-maps --extensions .ts,.tsx --delete-dir-on-start --no-comments",
+    "build:cjs": "cross-env BABEL_ENV=cjs babel src --root-mode upward --out-dir lib --source-maps --extensions .ts,.tsx --delete-dir-on-start --no-comments",
+    "build:esm": "cross-env BABEL_ENV=esm babel src --root-mode upward --out-dir es --source-maps --extensions .ts,.tsx --delete-dir-on-start --no-comments",
+    "watch": "cross-env BABEL_ENV=cjs babel src --watch --root-mode upward --out-dir lib --source-maps --extensions .ts,.tsx --delete-dir-on-start --no-comments",
     "lint:ts": "run-p -c lint:ts-*",
     "test": "umi-test --passWithNoTests",
     "sync": "tnpm sync"
@@ -37,7 +37,6 @@
   },
   "devDependencies": {
     "@antv/l7-layers": "2.17.7",
-    "@antv/l7-test-utils": "2.17.7",
     "gcoord": "^0.3.2",
     "less": "^4.1.3"
   },

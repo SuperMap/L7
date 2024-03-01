@@ -110,6 +110,8 @@ export default class ExtrudeModel extends BaseModel {
       },
       depth: {
         enable: depth,
+        // @ts-ignore
+        range: [0, 0.9]
       },
     });
     return [model];

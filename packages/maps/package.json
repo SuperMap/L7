@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "tsc": "tsc --project tsconfig.build.json",
-    "clean": "rimraf dist; rimraf es; rimraf lib;",
+    "clean": "rimraf dist && rimraf es && rimraf lib",
     "build": "father build",
     "build:cjs": "BABEL_ENV=cjs babel src --root-mode upward --out-dir lib --source-maps --extensions .ts,.tsx --delete-dir-on-start --no-comments",
     "build:esm": "BABEL_ENV=esm babel src --root-mode upward --out-dir es --source-maps --extensions .ts,.tsx --delete-dir-on-start --no-comments",
@@ -36,6 +36,7 @@
     "gl-matrix": "^3.1.0",
     "inversify": "^5.0.1",
     "mapbox-gl": "^1.2.1",
+    "maplibre-gl": "^3.0.0",
     "reflect-metadata": "^0.1.13",
     "viewport-mercator-project": "^6.2.1"
   },

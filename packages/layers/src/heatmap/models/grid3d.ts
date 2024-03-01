@@ -36,7 +36,11 @@ export default class Grid3DModel extends BaseModel {
       fragmentShader: heatmapGridFrag,
       triangulation: PointExtrudeTriangulation,
       primitive: gl.TRIANGLES,
-      depth: { enable: true },
+      depth: { 
+        enable: true,
+        // @ts-ignore
+        range: [0, 0.9]
+      },
     });
     return [model];
   }

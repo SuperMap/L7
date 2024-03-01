@@ -310,6 +310,22 @@ export default class PickingService implements IPickingService {
     this.alreadyInPicking = true;
     await this.pickingLayers(target);
     this.layerService.renderLayers();
+    // const layers = this.layerService.getRenderList();
+    // const pickedLayers = layers.filter((layer) => {
+    //   return (
+    //     layer.needPick(target.type) &&
+    //     this.layerService.pickedLayerId === +layer.id
+    //   );
+    // });
+    // // console.log(layers);
+    // if (pickedLayers.length > 0) {
+    //   pickedLayers.forEach((layer) => {
+    //     console.log('picking render -laeyr-------------');
+    //     // this.layerService.renderLayer(layer.id, true);
+    //     // @ts-ignore
+    //     // this.layerService.emit('update');
+    //   });
+    // }
     this.alreadyInPicking = false;
   }
 

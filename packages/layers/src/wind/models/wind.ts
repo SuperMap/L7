@@ -109,7 +109,8 @@ export default class WindModel extends BaseModel {
         height: imageHeight,
       });
 
-      this.layerService.reRender();
+      this.layerService.updateLayerRenderList();
+      // this.layerService.renderAllLayers();
     });
 
     const model = await this.layer.buildLayerModel({

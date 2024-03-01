@@ -3,7 +3,7 @@ import {
   IAttributeInitializationOptions,
   IBuffer,
 } from '@antv/l7-core';
-import regl from 'l7regl';
+import regl from './l7regl/regl.js';
 import ReglBuffer from './ReglBuffer';
 
 /**

@@ -11,6 +11,7 @@ export default {
     output: 'dist',
     externals: {
       "mapbox-gl": "mapboxgl",
+      "maplibre-gl": "maplibregl",
     },
   },
   platform:'browser',

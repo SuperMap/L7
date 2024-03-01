@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "tsc": "tsc --project tsconfig.build.json",
-    "clean": "rimraf dist; rimraf es; rimraf lib;",
+    "clean": "rimraf dist && rimraf es && rimraf lib",
     "b": "father build",
     "build": "father build",
     "build:cjs": "cross-env BABEL_ENV=cjs NODE_ENV=production  babel src --root-mode upward --out-dir lib --source-maps --extensions .ts,.tsx --delete-dir-on-start --no-comments",

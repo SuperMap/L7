@@ -10,7 +10,7 @@ export default {
     output: 'dist',
     externals: {
       "@antv/l7": "L7",
-      "three": "Three"
+      "three": "THREE"
     },
   },
   autoprefixer: {

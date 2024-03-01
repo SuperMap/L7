@@ -1,5 +1,5 @@
 import { gl, IBuffer, IBufferInitializationOptions } from '@antv/l7-core';
-import regl from 'l7regl';
+import regl from './l7regl/regl.js';
 import { dataTypeMap, usageMap } from './constants';
 
 /**

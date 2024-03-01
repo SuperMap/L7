@@ -1,0 +1,16 @@
+{
+  "name": "@supermap/maplibregl-l7-render",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SuperMap/L7/tree/for-iclient"
+  },
+  "version": "0.0.1",
+  "license": "MIT",
+  "sideEffects": true,
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ]
+}

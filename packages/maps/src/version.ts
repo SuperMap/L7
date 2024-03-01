@@ -6,6 +6,7 @@ export enum Version {
   'GAODE2.x' = 'GAODE2.x',
   'MAPBOX' = 'MAPBOX',
   'DEFUALT' = 'DEFUALTMAP',
+  'MAPLIBRE' = 'MAPLIBRE',
   'SIMPLE' = 'SIMPLE',
   'GLOBEL' = 'GLOBEL',
 }

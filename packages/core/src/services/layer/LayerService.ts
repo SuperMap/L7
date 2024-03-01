@@ -56,7 +56,6 @@ export default class LayerService
   }, 32);
 
   public throttleRenderLayers = throttle(() => {
-    this.renderLayers();
   }, 16);
 
   public needPick(type: string): boolean {
@@ -123,14 +122,15 @@ export default class LayerService
         this.layers.splice(layerIndex, 1);
       }
     }
-    layer.destroy();
-    this.reRender();
+    this.updateLayerRenderList();
+    // layer.destroy();
+    // this.renderLayers();
     this.emit('layerChange', this.layers);
   }
 
-  public async removeAllLayers(): Promise<void> {
-    this.destroy();
-    this.reRender();
+  public removeAllLayers(): void {
+    // this.destroy();
+    // this.reRender();
   }
 
   public setEnableRender(flag: boolean) {
@@ -138,15 +138,45 @@ export default class LayerService
   }
 
   public async renderLayers() {
-    if (this.alreadyInRendering || !this.enableRender) {
+    // if (this.alreadyInRendering || !this.enableRender) {
+    //   return;
+    // }
+    // this.updateLayerRenderList();
+    // const renderUid = this.debugService.generateRenderUid();
+    // this.debugService.renderStart(renderUid);
+    // this.alreadyInRendering = true;
+    // this.clear();
+    // for (const layer of this.layerList) {
+    //   const { enableMask } = layer.getLayerConfig();
+    //   if (layer.masks.filter((m) => m.inited).length > 0 && enableMask) {
+    //     // 清除上一次的模版缓存
+    //     this.renderMask(layer.masks);
+    //   }
+    //   if (layer.getLayerConfig().enableMultiPassRenderer) {
+    //     // multiPassRender 不是同步渲染完成的
+    //     await layer.renderMultiPass();
+    //   } else {
+    //     await layer.render();
+    //   }
+    // }
+    // this.debugService.renderEnd(renderUid);
+    // this.alreadyInRendering = false;
+  }
+
+  public async renderLayer(id: string) {
+    if (!this.enableRender) {
       return;
     }
     this.updateLayerRenderList();
+    const layer: ILayer | undefined = this.layerList.find(
+      (item) => item.id === id,
+    );
+    if (!layer) return;
     const renderUid = this.debugService.generateRenderUid();
     this.debugService.renderStart(renderUid);
-    this.alreadyInRendering = true;
-    this.clear();
-    for (const layer of this.layerList) {
+    // this.alreadyInRendering[id] = true;
+    // this.clear();
+    // for (const layer of this.layerList) {
       const { enableMask } = layer.getLayerConfig();
       if (layer.masks.filter((m) => m.inited).length > 0 && enableMask) {
         // 清除上一次的模版缓存
@@ -158,9 +188,9 @@ export default class LayerService
       } else {
         await layer.render();
       }
-    }
+    // }
     this.debugService.renderEnd(renderUid);
-    this.alreadyInRendering = false;
+    // this.alreadyInRendering[id] = false;
   }
 
   public renderMask(masks: ILayer[]) {
@@ -181,7 +211,8 @@ export default class LayerService
   public async beforeRenderData(layer: ILayer) {
     const flag = await layer.hooks.beforeRenderData.promise();
     if (flag) {
-      this.renderLayers();
+      this.renderLayer(layer.id);
+      // this.renderLayers();
     }
   }
   public renderTileLayerMask(layer: ILayer) {
@@ -257,10 +288,10 @@ export default class LayerService
     this.emit('layerChange', this.layers);
   }
 
-  public startAnimate() {
+  public startAnimate(id: any) {
     if (this.animateInstanceCount++ === 0) {
       this.clock.start();
-      this.runRender();
+      this.runRender(id);
     }
   }
 
@@ -303,11 +334,11 @@ export default class LayerService
     });
   }
 
-  private runRender() {
-    this.renderLayers();
-    this.layerRenderID = $window.requestAnimationFrame(
-      this.runRender.bind(this),
-    );
+  private runRender(id: any) {
+    this.renderLayer(id);
+    this.layerRenderID = $window.requestAnimationFrame(() => {
+      this.runRender(id);
+    });
   }
 
   private stopRender() {

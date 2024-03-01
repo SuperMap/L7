@@ -11,7 +11,7 @@ import inlineWorker from './rollup-plugin-inline-worker';
 import postcss from 'rollup-plugin-postcss';
 import url from 'postcss-url';
 
-const { BUILD, MINIFY } = process.env;
+const { BUILD, MINIFY, TYPE } = process.env;
 const minified = MINIFY === 'true';
 const production = BUILD === 'production';
 const outputFile = !production
@@ -26,21 +26,26 @@ function resolveFile(filePath) {
 
 module.exports = [
   {
-    input: resolveFile('build/bundle.ts'),
+    input: resolveFile(`build/bundle-${TYPE}.ts`),
     output: {
-      file: resolveFile(outputFile),
+      file: resolveFile(`l7-${TYPE}gl/dist/index.js`),
       format: 'umd',
-      name: 'L7',
+      name: `L7`,
       globals: {
-        'mapbox-gl': 'mapboxgl',
+        [`${TYPE}-gl`]: `${TYPE}gl`,
       },
+      sourcemap: true,
     },
-    external: ['mapbox-gl'],
+    external: [`${TYPE}-gl`],
     treeshake: minified,
     plugins: [
       alias({
         resolve: ['.tsx', '.ts'],
         entries: [
+          {
+            find: /^@antv\/l7-maps\/src\/(.*)\/index/,
+            replacement: resolveFile('packages/maps/src/$1/index'),
+          },
           {
             find: /^@antv\/l7-(.*)/,
             replacement: resolveFile('packages/$1/src'),
@@ -95,6 +100,12 @@ module.exports = [
         summaryOnly: true,
         limit: 20,
       }),
+      // visualizer({
+      //   open: true, // 注意这里要设置为true，否则无效
+      //   gzipSize: true, // 分析图生成的文件名
+      //   brotliSize: true, // 收集 brotli 大小并将其显示
+      //   filename: 'stats.html', // 分析图生成的文件名
+      // }),
     ],
   },
 ];

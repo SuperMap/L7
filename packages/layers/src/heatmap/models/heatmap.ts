@@ -332,6 +332,8 @@ export default class HeatMapModel extends BaseModel {
       },
       depth: {
         enable: true,
+        // @ts-ignore
+        range: [0, 0.9]
       },
       blend: {
         enable: true,

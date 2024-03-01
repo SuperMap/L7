@@ -498,6 +498,7 @@ export interface ILayer {
   ): ILayer;
   renderLayers(): void;
   render(options?: Partial<IRenderOptions>): ILayer;
+  // render(isPicking?: boolean): ILayer;
 
   renderMultiPass(): any;
 
@@ -698,7 +699,9 @@ export type LayerServiceEvent = 'layerChange';
 /**
  * 提供 Layer 管理服务
  */
-
+export type ILayerRendering = {
+  [prop: string]: boolean;
+};
 export interface ILayerService {
   pickedLayerId: number;
   clock: Clock;
@@ -716,7 +719,7 @@ export interface ILayerService {
   clear(): void;
   add(layer: ILayer): void;
   initLayers(): Promise<void>;
-  startAnimate(): void;
+  startAnimate(id: string): void;
   stopAnimate(): void;
   getSceneInited(): boolean;
   getLayers(): ILayer[];
@@ -724,7 +727,7 @@ export interface ILayerService {
   getLayer(id: string): ILayer | undefined;
   getLayerByName(name: string): ILayer | undefined;
   remove(layer: ILayer, parentLayer?: ILayer): Promise<void>;
-  removeAllLayers(): Promise<void>;
+  removeAllLayers(): void;
   updateLayerRenderList(): void;
   reRender(): void;
   beforeRenderData(layer: ILayer): Promise<void>;
@@ -734,6 +737,7 @@ export interface ILayerService {
   needPick(type: string): boolean;
   throttleRenderLayers(): void;
   renderLayers(): void;
+  renderLayer(id?: string, isPicking?: boolean): void;
   setEnableRender(flag: boolean): void;
   getOESTextureFloat(): boolean;
   addMask(mask: ILayer): void;

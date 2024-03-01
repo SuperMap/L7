@@ -1,3 +1,4 @@
+#extension GL_OES_standard_derivatives : enable
 precision mediump float;
 uniform float u_opacity: 1.0;
 uniform sampler2D u_texture;

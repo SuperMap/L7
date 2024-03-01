@@ -81,6 +81,7 @@ export class ThreeRenderService implements IThreeRenderService {
       case 'GAODE2.x':
         return this.AMap2Camera();
       case 'MAPBOX':
+      case 'MAPLIBRE':
         return this.mapboxCamera();
       case 'DEFAULTMAP':
         return this.mapboxCamera();

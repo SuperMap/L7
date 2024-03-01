@@ -1,5 +1,6 @@
 /// <reference types="amap-js-api" />
 import { IControl } from 'mapbox-gl';
+import { IControl as MaplibreIControl } from 'maplibre-gl';
 
 interface Window {
   initAMap: () => void;
@@ -31,6 +32,14 @@ interface IAMapInstance {
 
 interface IMapboxInstance {
   _controls: IControl[];
+  transform: {
+    width: number;
+    height: number;
+  };
+}
+
+interface IMaplibreInstance {
+  _controls: MaplibreIControl[];
   transform: {
     width: number;
     height: number;

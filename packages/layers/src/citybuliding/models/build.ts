@@ -76,7 +76,11 @@ export default class CityBuildModel extends BaseModel {
       vertexShader: buildVert,
       fragmentShader: buildFrag,
       triangulation: PolygonExtrudeTriangulation,
-      depth: { enable: true },
+      depth: { 
+        enable: true,
+        // @ts-ignore
+        range: [0, 0.9]
+      },
       cull: {
         enable: true,
         face: gl.BACK,

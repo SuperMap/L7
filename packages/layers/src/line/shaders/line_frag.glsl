@@ -1,4 +1,4 @@
-#extension GL_OES_standard_derivatives : enable
+// #extension GL_OES_standard_derivatives : enable
 #define Animate 0.0
 #define LineTexture 1.0
 uniform float u_textureBlend;

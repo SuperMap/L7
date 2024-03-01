@@ -551,7 +551,7 @@ export default class BaseLayer<ChildLayerStyleOptions = {}>
     // 启动动画
     const { animateOption } = this.getLayerConfig();
     if (animateOption?.enable) {
-      this.layerService.startAnimate();
+      // this.layerService.startAnimate(this.id);
       this.animateStatus = true;
     }
   }

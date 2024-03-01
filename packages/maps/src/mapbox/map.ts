@@ -118,21 +118,6 @@ export default class MapboxService extends BaseMapService<
       console.error(this.configService.getSceneWarninfo('SDK'));
     }
 
-    if (
-      token === MAPBOX_API_KEY &&
-      style !== 'blank' &&
-      !window.mapboxgl.accessToken &&
-      !mapInstance // 如果用户传递了 mapInstance，应该不去干预实例的 accessToken。
-    ) {
-      console.warn(this.configService.getSceneWarninfo('MapToken'));
-    }
-
-    // 判断是否设置了 accessToken
-    if (!mapInstance && !window.mapboxgl.accessToken) {
-      // 用户有时传递进来的实例是继承于 mapbox 实例化的，不一定是 mapboxgl 对象。
-      window.mapboxgl.accessToken = token;
-    }
-
     if (mapInstance) {
       // @ts-ignore
       this.map = mapInstance;

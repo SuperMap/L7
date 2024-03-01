@@ -12,6 +12,7 @@ export default class Viewport implements IViewport {
      * Deck.gl 使用的也是 Mapbox 同步相机，相机参数保持一致
      * 例如相机高度固定为 height * 1.5，因此不需要传
      */
+    
     this.viewport = new WebMercatorViewport({
       width: viewportWidth,
       height: viewportHeight,

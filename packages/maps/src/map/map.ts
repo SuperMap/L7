@@ -211,7 +211,6 @@ export default class DefaultMapService extends BaseMapService<Map> {
     pitch: number,
   ) => {
     const { offsetCoordinate = true } = this.config;
-
     // resync
     this.viewport.syncWithMapCamera({
       // bearing: this.map.getBearing(),

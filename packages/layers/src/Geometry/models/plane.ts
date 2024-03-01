@@ -153,7 +153,11 @@ export default class PlaneModel extends BaseModel {
       fragmentShader: planeFrag,
       triangulation: this.planeGeometryTriangulation,
       primitive: gl.TRIANGLES,
-      depth: { enable: true },
+      depth: { 
+        enable: true,
+        // @ts-ignore
+        range: [0, 0.9]
+      },
 
       cull: {
         enable: true,
@@ -208,7 +212,8 @@ export default class PlaneModel extends BaseModel {
           wrapS: gl.CLAMP_TO_EDGE,
           wrapT: gl.CLAMP_TO_EDGE,
         });
-        this.layerService.reRender();
+        this.layerService.updateLayerRenderList();
+        // this.layerService.renderAllLayers();
       };
       img.src = mapTexture;
     } else {

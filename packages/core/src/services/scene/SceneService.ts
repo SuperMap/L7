@@ -180,14 +180,9 @@ export default class Scene extends EventEmitter implements ISceneService {
         );
       }
 
-      // 创建底图之上的 container
       if (this.$container) {
-        this.canvas = DOM.create(
-          'canvas',
-          '',
-          this.$container,
-        ) as HTMLCanvasElement;
-        this.setCanvas();
+          // @ts-ignore
+          this.canvas = this.map.map._canvas;
         await this.rendererService.init(
           // @ts-ignore
           this.canvas,
@@ -476,7 +471,11 @@ export default class Scene extends EventEmitter implements ISceneService {
 
   private handleMapCameraChanged = (viewport: IViewport) => {
     this.cameraService.update(viewport);
-    this.render();
+    // @ts-ignore
+    this.layerService.layerList.forEach(item => {
+      // this.render(item.id);
+      this.layerService.renderLayer(item.id)
+    });
   };
 
   private addSceneEvent(target: IInteractionTarget) {

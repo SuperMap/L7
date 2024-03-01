@@ -80,7 +80,11 @@ export default class RasterModel extends BaseModel {
       fragmentShader: rasterFrag,
       triangulation: RasterImageTriangulation,
       primitive: gl.TRIANGLES,
-      depth: { enable: false },
+      depth: { 
+        enable: false, 
+        // @ts-ignore
+        range: [0, 0.9]
+      },
     });
     return [model];
   }

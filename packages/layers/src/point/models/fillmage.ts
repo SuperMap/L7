@@ -96,7 +96,11 @@ export default class FillImageModel extends BaseModel {
       vertexShader: pointFillVert,
       fragmentShader: pointFillFrag,
       triangulation: PointFillTriangulation,
-      depth: { enable: false },
+      depth: { 
+        enable: false,
+        // @ts-ignore
+        range: [0, 0.9]
+      },
 
       cull: {
         enable: true,

@@ -5,6 +5,7 @@ import BaseModel from '../../core/BaseModel';
 import { IGeometryLayerStyleOptions } from '../../core/interface';
 import spriteFrag from '../shaders/sprite_frag.glsl';
 import spriteVert from '../shaders/sprite_vert.glsl';
+import throttle from 'lodash.throttle';
 
 enum SPRITE_ANIMATE_DIR {
   'UP' = 'up',
@@ -93,8 +94,7 @@ export default class SpriteModel extends BaseModel {
     this.layer.models.map((m) => {
       m.updateAttributes(attributes);
     });
-    this.layerService.throttleRenderLayers();
-
+    throttle(()=>{ this.layerService.renderLayer(this.layer.id)}, 168);
     this.timer = requestAnimationFrame(this.updateModel);
   };
 

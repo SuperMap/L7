@@ -8,7 +8,7 @@ import {
   IModelInitializationOptions,
   IUniform,
 } from '@antv/l7-core';
-import regl from 'l7regl';
+import regl from './l7regl/regl.js';
 import { isPlainObject, isTypedArray } from 'lodash';
 import {
   blendEquationMap,
@@ -204,7 +204,8 @@ export default class ReglModel implements IModel {
     reglDrawProps.stencil = this.getStencilDrawParams(options);
     // @ts-ignore
     reglDrawProps.colorMask = this.getColorMaskDrawParams(options, pick);
-
+    // @ts-ignore
+    this.reGl._refreshTexture();
     // 在进行拾取操作的绘制中，不应该使用叠加模式 - picking 根据拾取的颜色作为判断的输入，而叠加模式会产生新的，在 id 序列中不存在的颜色
     this.drawCommand(reglDrawProps);
   }

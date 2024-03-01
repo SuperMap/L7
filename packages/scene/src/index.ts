@@ -183,6 +183,11 @@ class Scene
 
   public setBgColor(color: string) {
     this.mapService.setBgColor(color);
+    const canvasContainer = this.getMapCanvasContainer();
+    const canvas = canvasContainer.children[0] as HTMLCanvasElement;
+    if (canvas) {
+      canvas.style.background = color;
+    }
   }
 
   // layer 管理

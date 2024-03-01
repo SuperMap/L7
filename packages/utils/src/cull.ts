@@ -17,6 +17,7 @@ export function getCullFace(mapVersion: string | undefined): number {
       return gl.BACK;
       break;
     case 'MAPBOX':
+    case 'MAPLIBRE':
       return gl.FRONT;
       break;
     case 'SIMPLE':

@@ -25,7 +25,7 @@
   },
   "scripts": {
     "tsc": "tsc --project tsconfig.build.json",
-    "clean": "rimraf dist; rimraf es; rimraf lib;",
+    "clean": "rimraf dist && rimraf es && rimraf lib",
     "build": "father build",
     "lint:ts": "run-p -c lint:ts-*",
     "build:cjs": "BABEL_ENV=cjs babel src --root-mode upward --out-dir lib --source-maps --extensions .ts,.tsx --delete-dir-on-start --no-comments",

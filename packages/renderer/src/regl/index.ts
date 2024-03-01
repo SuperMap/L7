@@ -23,7 +23,7 @@ import {
 } from '@antv/l7-core';
 import { isMini } from '@antv/l7-utils';
 import { injectable } from 'inversify';
-import regl from 'l7regl';
+import regl from './l7regl/regl.js';
 import 'reflect-metadata';
 import ReglAttribute from './ReglAttribute';
 import ReglBuffer from './ReglBuffer';
@@ -109,8 +109,31 @@ export default class ReglRendererService implements IRendererService {
     return !!this.getGLContext().getExtension(name);
   }
 
-  public createModel = (options: IModelInitializationOptions): IModel =>
-    new ReglModel(this.gl, options);
+  public createModel = (options: IModelInitializationOptions): IModel => {
+    // console.log('createModel', options);
+    // @ts-ignore
+    // options.cull?.enable = false;
+    // @ts-ignore
+    // options.depth?.enable = false;
+    // gl.enable(gl.POLYGON_OFFSET_FILL);
+    // gl.polygonOffset(1.0, 1.0);
+    // // console.log('polygonOffset', options);
+    // // @ts-ignore
+    // options.polygonOffset = {
+    //   enable: true,
+    //   offset: [1, 1],
+    // };
+    // // options.offset = 1;
+    // gl.clearColor(0.0, 0.0, 0.0, 0.0);
+    // // @ts-ignore
+    // gl.clearDepth(1.0);
+    // // @ts-ignore
+    // gl.clear(gl.DEPTH_BUFFER_BIT);
+    // this.gl._gl.enable(this.gl._gl.DEPTH_TEST);
+    // this.gl._gl.clear(this.gl._gl.DEPTH_BUFFER_BIT);
+    // this.clear({ framebuffer: null });
+    return new ReglModel(this.gl, options);
+  };
 
   public createAttribute = (
     options: IAttributeInitializationOptions,
@@ -197,11 +220,12 @@ export default class ReglRendererService implements IRendererService {
   };
 
   public getContainer = () => {
-    if (isMini) {
-      return this.canvas;
-    } else {
-      return this.canvas?.parentElement;
-    }
+    return this.canvas;
+    // if (isMini) {
+    //   return this.canvas;
+    // } else {
+    //   return this.canvas?.parentElement;
+    // }
   };
 
   public getCanvas = () => {
