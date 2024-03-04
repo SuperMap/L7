@@ -10,7 +10,7 @@ import glsl from './rollup-plugin-glsl';
 import inlineWorker from './rollup-plugin-inline-worker';
 import postcss from 'rollup-plugin-postcss';
 import url from 'postcss-url';
-
+// const { visualizer } = require('rollup-plugin-visualizer');
 const { BUILD, MINIFY, TYPE } = process.env;
 const minified = MINIFY === 'true';
 const production = BUILD === 'production';
@@ -28,7 +28,7 @@ module.exports = [
   {
     input: resolveFile(`build/bundle-${TYPE}.ts`),
     output: {
-      file: resolveFile(`l7-${TYPE}gl/dist/index.js`),
+      file: resolveFile(`${TYPE}gl-l7-render/dist/index.js`),
       format: 'umd',
       name: `L7`,
       globals: {
@@ -92,7 +92,7 @@ module.exports = [
         ],
       }),
       babel({
-        extensions: ['.js', '.ts'],
+        extensions: ['.js', '.ts']
       }),
       // terser(),
       minified ? terser() : false,
