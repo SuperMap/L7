@@ -175,6 +175,7 @@
     "clean": "lerna run clean --parallel",
     "clear-node-modules": "rimraf node_modules && lerna clean -y",
     "sync": "lerna run sync --parallel",
+    "worker": "cross-env BABEL_ENV=bundle NODE_ENV=production yarn rollup -c build/rollup.config.worker.js --environment BUILD:production",
     "bundle-mapboxgl": "cross-env BABEL_ENV=bundle yarn rollup -c  build/rollup.config.js  --environment BUILD:production,MINIFY:true,TYPE:mapbox",
     "bundle-maplibregl": "cross-env BABEL_ENV=bundle yarn rollup -c  build/rollup.config.js  --environment BUILD:production,MINIFY:true,TYPE:maplibre",
     "bundle:watch": "cross-env BABEL_ENV=bundle yarn rollup -c build/rollup.config.js --watch",
