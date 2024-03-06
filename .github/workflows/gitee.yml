@@ -15,6 +15,6 @@ jobs:
         uses: pixta-dev/repository-mirroring-action@v1
         with:
           target_repo_url:
-            https://gitee.com/isupermap/l7.git
+            git@gitee.com:isupermap/l7.git
           ssh_private_key:
             ${{ secrets.GITEE_KEY }}
