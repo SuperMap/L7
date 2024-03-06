@@ -179,8 +179,8 @@
     "bundle-mapboxgl": "cross-env BABEL_ENV=bundle yarn rollup -c  build/rollup.config.js  --environment BUILD:production,MINIFY:true,TYPE:mapbox",
     "bundle-maplibregl": "cross-env BABEL_ENV=bundle yarn rollup -c  build/rollup.config.js  --environment BUILD:production,MINIFY:true,TYPE:maplibre",
     "bundle:watch": "cross-env BABEL_ENV=bundle yarn rollup -c build/rollup.config.js --watch",
-    "publish:maplibregl": "yarn publish l7-maplibregl",
-    "publish:mapboxgl": "yarn publish l7-mapboxgl"
+    "publish:maplibregl": "yarn publish maplibregl-l7-render",
+    "publish:mapboxgl": "yarn publish mapboxgll-l7-render"
   },
   "workspaces": [
     "packages/*",
