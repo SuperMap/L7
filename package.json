@@ -180,12 +180,8 @@
     "bundle-maplibregl": "cross-env BABEL_ENV=bundle yarn rollup -c  build/rollup.config.js  --environment BUILD:production,MINIFY:true,TYPE:maplibre",
     "bundle:watch": "cross-env BABEL_ENV=bundle yarn rollup -c build/rollup.config.js --watch",
     "publish:maplibregl": "yarn publish maplibregl-l7-render",
-    "publish:mapboxgl": "yarn publish mapboxgll-l7-render"
+    "publish:mapboxgl": "yarn publish mapboxgl-l7-render --registry=http://172.16.15.181:4873"
   },
-  "workspaces": [
-    "packages/*",
-    "dev-demos/*"
-  ],
   "browserslist": [
     "last 2 version",
     "Firefox ESR"
@@ -201,6 +197,5 @@
   "tnpm": {
     "mode": "yarn"
   },
-  "version": "0.0.0",
-  "private": true
+  "version": "0.0.0"
 }
