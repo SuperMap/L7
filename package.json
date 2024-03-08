@@ -162,6 +162,10 @@
     "worker-loader": "^2.0.0",
     "yorkie": "^2.0.0"
   },
+  "workspaces": [
+    "packages/*",
+    "dev-demos/*"
+  ],
   "scripts": {
     "lint:tslint": "tslint -p tsconfig.json -c tslint.prod.json",
     "lint-tslint-fix": "tslint -p tsconfig.json -c tslint.prod.json --fix",
