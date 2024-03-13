@@ -34,7 +34,7 @@ module.exports = [
       globals: {
         [`${TYPE}-gl`]: `${TYPE}gl`,
       },
-      sourcemap: true,
+      sourcemap: !production,
     },
     external: [`${TYPE}-gl`],
     treeshake: minified,
@@ -85,6 +85,7 @@ module.exports = [
             'isNumber',
             'isPlainObject',
             'merge',
+            'throttle'
           ],
         },
         dynamicRequireTargets: [
