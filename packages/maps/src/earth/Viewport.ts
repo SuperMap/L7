@@ -1,7 +1,7 @@
 import { IViewport } from '@antv/l7-core';
 import { mat4, vec3 } from 'gl-matrix';
-import WebMercatorViewport from 'viewport-mercator-project';
-
+// @ts-ignore
+import WebMercatorViewport from '../viewport-mercator-project/web-mercator-viewport';
 export interface IEarthCamera {
   viewportHeight: number;
   viewportWidth: number;

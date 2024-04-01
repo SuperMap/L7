@@ -336,11 +336,13 @@ export default abstract class BaseMapService<T>
       zoom: this.map.getZoom(),
       // mapbox 中固定相机高度为 viewport 高度的 1.5 倍
       cameraHeight: 0,
+      map: this.map
     });
 
     this.updateCoordinateSystemService();
     this.cameraChangedCallback(this.viewport as IViewport);
   };
+
 
   protected creatMapContainer(id: string | HTMLDivElement) {
     let $wrapper = id as HTMLDivElement;
@@ -362,6 +364,7 @@ export default abstract class BaseMapService<T>
       zoom: viewOption.zoom,
       // mapbox 中固定相机高度为 viewport 高度的 1.5 倍
       cameraHeight: 0,
+      map: this.map
     });
     this.updateCoordinateSystemService();
     this.cameraChangedCallback(this.viewport as IViewport);

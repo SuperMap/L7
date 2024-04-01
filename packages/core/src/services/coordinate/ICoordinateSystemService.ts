@@ -28,7 +28,7 @@ export const CoordinateUniform = {
   PixelsPerDegree: 'u_PixelsPerDegree',
   PixelsPerDegree2: 'u_PixelsPerDegree2',
   PixelsPerMeter: 'u_PixelsPerMeter',
-
+  MultiCoor: 'u_isMultiCoor',
   Mvp: 'u_Mvp',
 };
 

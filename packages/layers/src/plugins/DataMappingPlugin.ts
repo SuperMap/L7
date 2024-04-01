@@ -1,4 +1,5 @@
 import {
+  ICoordinateSystemService,
   IDebugLog,
   IEncodeFeature,
   IFontService,
@@ -16,16 +17,45 @@ import { Version } from '@antv/l7-maps';
 import { normalize, rgb2arr } from '@antv/l7-utils';
 import { inject, injectable } from 'inversify';
 import { cloneDeep } from 'lodash';
+import { Map } from 'mapbox-gl';
 import 'reflect-metadata';
+import { transformToMultiCoor } from '../../../maps/src/mapbox';
 import { ILineLayerStyleOptions } from '../core/interface';
 
 @injectable()
 export default class DataMappingPlugin implements ILayerPlugin {
+  @inject(TYPES.ICoordinateSystemService)
+  private readonly coordinateSystemService: ICoordinateSystemService;
+
   @inject(TYPES.IMapService)
   private readonly mapService: IMapService;
 
   @inject(TYPES.IFontService)
   private readonly fontService: IFontService;
+
+  private mapZoom: number;
+
+  private resetLayerEncodeData(
+    layer: ILayer,
+    styleAttributeService: IStyleAttributeService,
+  ) {
+    const map = this.mapService.map;
+    if(!map) return;
+    const callback = () => {
+      if (map.getZoom() <= 12 && this.mapZoom > 12) {
+        this.apply(layer, {
+          styleAttributeService,
+        });
+      }
+      if (map.getZoom() > 12 && this.mapZoom <= 12) {
+        this.apply(layer, {
+          styleAttributeService,
+        });
+      }
+    }
+    map.off('zoomend', callback);
+    map.on('zoomend', callback);
+  }
 
   public apply(
     layer: ILayer,
@@ -195,7 +225,69 @@ export default class DataMappingPlugin implements ILayerPlugin {
 
     // 调整数据兼容 SimpleCoordinates
     this.adjustData2SimpleCoordinates(mappedData);
+
+    // ---------iclient--------调整数据，mapbox多坐标系投影转换(< 12级且是多坐标系)
+    if (
+      this.mapService.map.getZoom() < 12 &&
+      this.coordinateSystemService.getCoordinateSystem() === 1
+    ) {
+      this.adjustData2MapboxCoordinates(mappedData);
+    }
     return mappedData;
+  }
+
+  /**
+   * mapbox多坐标系投影转换数据里的坐标
+   */
+  private adjustData2MapboxCoordinates(mappedData: IEncodeFeature[]) {
+    if (
+      mappedData.length > 0 &&
+      this.mapService.version === Version['MAPBOX']
+    ) {
+      mappedData.map((d) => {
+        // @ts-ignore
+        d.originCoordinates = cloneDeep(d.coordinates); // 为了兼容高德1.x 需要保存一份原始的经纬度坐标数据（许多上层逻辑依赖经纬度数据）
+        // @ts-ignore
+        d.coordinates = this.getMapboxCoordiantes(d.coordinates);
+      });
+    }
+  }
+
+  private getMapboxCoordiantes(coordinates: any) {
+    const map = this.mapService.map as Map;
+    const TILESIZE = 512;
+    if (typeof coordinates[0] === 'number') {
+      return transformToMultiCoor(
+        coordinates as [number, number],
+        map,
+        TILESIZE,
+      );
+    }
+
+    if (coordinates[0] && coordinates[0][0] instanceof Array) {
+      // @ts-ignore
+      const coords = [];
+      coordinates.map((coord: any) => {
+        // @ts-ignore
+        const c1 = [];
+        coord.map((co: any) => {
+          c1.push(transformToMultiCoor(co, map, TILESIZE));
+        });
+        // @ts-ignore
+        coords.push(c1);
+      });
+      // @ts-ignore
+      return coords;
+    } else {
+      // @ts-ignore
+      const coords = [];
+      // @ts-ignore
+      coordinates.map((coord) => {
+        coords.push(transformToMultiCoor(coord, map, TILESIZE));
+      });
+      // @ts-ignore
+      return coords;
+    }
   }
 
   private adjustData2Amap2Coordinates(

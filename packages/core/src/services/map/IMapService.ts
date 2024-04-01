@@ -313,6 +313,7 @@ export interface IMapCamera {
   lookAt?: [number, number, number];
   // 偏移原点，例如 P20 坐标系下
   offsetOrigin: [number, number];
+  map?: any;
 }
 export interface ICameraOptions {
   padding:

@@ -10,3 +10,4 @@ export default class MapboxWrapper extends BaseMapWrapper<
     return MapboxService;
   }
 }
+export * from './utils';

@@ -27,6 +27,7 @@ export interface IViewport {
     lngLat: [number, number],
     scale?: number | undefined,
   ): [number, number];
+  getIsTransformCoordinates?: (map?: any) => boolean
 }
 
 export interface ICameraService extends Omit<IViewport, 'syncWithMapCamera'> {

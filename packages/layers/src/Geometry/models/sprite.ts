@@ -5,7 +5,7 @@ import BaseModel from '../../core/BaseModel';
 import { IGeometryLayerStyleOptions } from '../../core/interface';
 import spriteFrag from '../shaders/sprite_frag.glsl';
 import spriteVert from '../shaders/sprite_vert.glsl';
-import throttle from 'lodash.throttle';
+import { throttle } from 'lodash';
 
 enum SPRITE_ANIMATE_DIR {
   'UP' = 'up',

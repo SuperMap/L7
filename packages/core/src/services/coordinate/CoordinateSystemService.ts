@@ -4,7 +4,6 @@ import 'reflect-metadata';
 import { TYPES } from '../../types';
 import { getDistanceScales } from '../../utils/project';
 import { ICameraService } from '../camera/ICameraService';
-// import { IMapService } from '../map/IMapService'
 import {
   CoordinateSystem,
   ICoordinateSystemService,
@@ -20,9 +19,10 @@ export default class CoordinateSystemService
   @inject(TYPES.ICameraService)
   private readonly cameraService: ICameraService;
 
-  // map.getCenter
   // @inject(TYPES.IMapService)
-  // private readonly mapService: IMapService
+  // // map.getCenter
+  // // @inject(TYPES.IMapService)
+  // // private readonly mapService: IMapService
 
   /**
    * 1. Web 墨卡托坐标系
@@ -66,13 +66,14 @@ export default class CoordinateSystemService
    * 重新计算当前坐标系参数
    * TODO: 使用 memoize 缓存参数以及计算结果
    */
-  public refresh(offsetCenter?: [number, number]): void {
+  public refresh(offsetCenter: [number, number]): void {
     // if (!this.needRefresh) {
     //   return;
     // }
     const zoom = this.cameraService.getZoom();
     const zoomScale = this.cameraService.getZoomScale();
     const center = offsetCenter ? offsetCenter : this.cameraService.getCenter();
+    // const center = offsetCenter;
 
     // 计算像素到米以及经纬度之间的转换
     const { pixelsPerMeter, pixelsPerDegree } = getDistanceScales({
@@ -128,6 +129,10 @@ export default class CoordinateSystemService
 
   public getPixelsPerMeter(): [number, number, number] {
     return this.pixelsPerMeter;
+  }
+
+  public getIsTransformCoordinates(): boolean {
+    return Boolean(this.cameraService.getIsTransformCoordinates && this.cameraService.getIsTransformCoordinates());
   }
 
   private calculateLnglatOffset(

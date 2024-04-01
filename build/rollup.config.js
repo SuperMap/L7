@@ -11,6 +11,7 @@ import inlineWorker from './rollup-plugin-inline-worker';
 import postcss from 'rollup-plugin-postcss';
 import url from 'postcss-url';
 // const { visualizer } = require('rollup-plugin-visualizer');
+
 const { BUILD, MINIFY, TYPE } = process.env;
 const minified = MINIFY === 'true';
 const production = BUILD === 'production';
@@ -61,7 +62,7 @@ module.exports = [
         preferBuiltins: false,
         extensions: ['.js', '.ts'],
       }),
-      glsl(['**/*.glsl'], true),
+      glsl(['**/*.glsl'], false),
       inlineWorker(['**/*.worker.js']),
       json(),
       postcss({

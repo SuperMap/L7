@@ -12,6 +12,8 @@ import {
 import { $window } from '@antv/l7-utils';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
+import { isMultiCoor, transformToMultiCoor } from '../../../maps/src/mapbox';
+import { Version } from '@antv/l7-maps';
 
 /**
  * 在渲染之前需要获取当前 Shader 所需 Uniform，例如：
@@ -42,6 +44,7 @@ export default class ShaderUniformPlugin implements ILayerPlugin {
     layer.hooks.beforeRender.tap('ShaderUniformPlugin', () => {
       // @ts-ignore
       const offset = layer.getLayerConfig().tileOrigin;
+      // const offsetCenter = transformToMultiCoor(offset, this.mapService.map as any, 512);
       // 重新计算坐标系参数
       this.coordinateSystemService.refresh(offset);
 
@@ -69,6 +72,8 @@ export default class ShaderUniformPlugin implements ILayerPlugin {
           [CameraUniform.CameraPosition]:
             this.cameraService.getCameraPosition(),
           // 坐标系参数
+          // ---------iclient--------MultiCoor
+          [CoordinateUniform.MultiCoor]: this.getIsMultiCoor(),
           [CoordinateUniform.CoordinateSystem]:
             this.coordinateSystemService.getCoordinateSystem(),
           [CoordinateUniform.ViewportCenter]:
@@ -110,5 +115,20 @@ export default class ShaderUniformPlugin implements ILayerPlugin {
     if (this.mapService.setCoordCenter) {
       this.mapService.setCoordCenter(layer.coordCenter);
     }
+  }
+  private getIsMultiCoor() {
+    if( this.mapService.version !== Version['MAPBOX']) {
+      return false;
+    }
+    return isMultiCoor(this.mapService.map);
+  }
+  private getViewportCenter() {
+    const center = this.coordinateSystemService.getViewportCenter();
+    const map = this.mapService.map as any;
+    const TILESIZE = 512;
+    if( this.mapService.version === Version['MAPBOX']) {
+      return transformToMultiCoor(center as [number, number], map, TILESIZE);
+    }
+    return center;
   }
 }

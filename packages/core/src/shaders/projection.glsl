@@ -24,6 +24,8 @@ uniform vec4 u_ViewportCenterProjection;
 uniform vec3 u_PixelsPerDegree;
 uniform vec3 u_PixelsPerDegree2;
 uniform vec3 u_PixelsPerMeter;
+ // ---------iclient--------u_isMultiCoor
+uniform bool u_isMultiCoor: false;
 
 uniform vec2 u_ViewportSize;
 uniform float u_DevicePixelRatio;
@@ -101,6 +103,7 @@ vec4 project_position(vec4 position) {
   float a = COORDINATE_SYSTEM_LNGLAT_OFFSET;
   float b = COORDINATE_SYSTEM_P20_OFFSET;
   float c = COORDINATE_SYSTEM_LNGLAT;
+ 
   if (u_CoordinateSystem == COORDINATE_SYSTEM_LNGLAT_OFFSET
     || u_CoordinateSystem == COORDINATE_SYSTEM_P20_OFFSET) {
     float X = position.x - u_ViewportCenter.x;
@@ -108,6 +111,14 @@ vec4 project_position(vec4 position) {
     return project_offset(vec4(X, Y, position.z, position.w));
   }
   if (u_CoordinateSystem < COORDINATE_SYSTEM_LNGLAT + 0.01 && u_CoordinateSystem >COORDINATE_SYSTEM_LNGLAT - 0.01) {
+     // ---------iclient--------u_isMultiCoor
+     if (u_isMultiCoor) {
+      return vec4(
+        position.xy * u_ZoomScale,
+        project_scale(position.z),
+        position.w
+      );
+    }
     return vec4(
       project_mercator(position.xy) * WORLD_SCALE * u_ZoomScale,
       project_scale(position.z),

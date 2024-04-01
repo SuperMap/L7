@@ -1,13 +1,18 @@
 import { IMapCamera, IViewport } from '@antv/l7-core';
-import WebMercatorViewport from 'viewport-mercator-project';
+import WebMercatorViewport from '../viewport-mercator-project/web-mercator-viewport';
+import { isMultiCoor } from './utils';
 
 export default class Viewport implements IViewport {
   public viewport: WebMercatorViewport;
+  private map: any;
 
   public syncWithMapCamera(mapCamera: Partial<IMapCamera>) {
-    const { center, zoom, pitch, bearing, viewportHeight, viewportWidth } =
+    const { center, zoom, pitch, bearing, viewportHeight, viewportWidth, map } =
       mapCamera;
+    // const isLngLat = zoom as number < 12;
+    // const transformFun = isLngLat && isMultiCoor(map) && transformToMultiCoor;
 
+    this.map = map;
     /**
      * Deck.gl 使用的也是 Mapbox 同步相机，相机参数保持一致
      * 例如相机高度固定为 height * 1.5，因此不需要传
@@ -21,7 +26,17 @@ export default class Viewport implements IViewport {
       zoom,
       pitch,
       bearing,
+       // ---------iclient--------isGeographicCoordinateSystem
+      isGeographicCoordinateSystem: this.getIsGeographicCoordinateSystem(map)
     });
+  }
+
+  private getIsGeographicCoordinateSystem(map: any): boolean {
+    return isMultiCoor(map)
+  }
+
+  private getIsTransformCoordinates(map = this.map): boolean {
+    return isMultiCoor(map) && this.getZoom() < 12;
   }
 
   public getZoom(): number {
@@ -69,6 +84,7 @@ export default class Viewport implements IViewport {
     lngLat: [number, number],
     scale?: number | undefined,
   ): [number, number] {
-    return this.viewport.projectFlat(lngLat, scale);
+    // ---------iclient--------getIsGeographicCoordinateSystem
+    return this.viewport.projectFlat(lngLat, scale, this.getIsGeographicCoordinateSystem(this.map));
   }
 }
