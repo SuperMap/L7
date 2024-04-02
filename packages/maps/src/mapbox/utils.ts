@@ -33,7 +33,7 @@ export function transformToMultiCoor(
   const height = extent[3] - extent[1];
   const xScale = ((coor[0] - extent[0]) / width) * worldScales + 0;
   const yScale =
-    ((extent[3] - coor[1]) / height) * worldScales - worldScales / 4;
+    ((extent[3] - coor[1]) / height) * worldScales;
   return [xScale, yScale];
 }
 
@@ -41,11 +41,12 @@ export function isMultiCoor(map: any): boolean {
   if (!map) {
     return false;
   }
-  // @ts-ignore
-  if (mapboxgl.CRS) {
-    // @ts-ignore
-    return map.getCRS()?.epsgCode !== 'EPSG:3857';
-  }
+  // // @ts-ignore
+  // if (mapboxgl.CRS) {
+  //   // @ts-ignore
+  //   return map.getCRS()?.epsgCode !== 'EPSG:3857';
+  // }
 
-  return false;
+  // return false;
+  return true;
 }

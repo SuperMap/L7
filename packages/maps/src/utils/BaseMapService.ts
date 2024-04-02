@@ -373,15 +373,15 @@ export default abstract class BaseMapService<T>
   protected updateCoordinateSystemService() {
     const { offsetCoordinate = true } = this.config;
     // set coordinate system
-    if (
-      (this.viewport as IViewport).getZoom() > LNGLAT_OFFSET_ZOOM_THRESHOLD &&
-      offsetCoordinate
-    ) {
-      this.coordinateSystemService.setCoordinateSystem(
-        CoordinateSystem.LNGLAT_OFFSET,
-      );
-    } else {
+    // if (
+    //   (this.viewport as IViewport).getZoom() > LNGLAT_OFFSET_ZOOM_THRESHOLD &&
+    //   offsetCoordinate
+    // ) {
+    //   this.coordinateSystemService.setCoordinateSystem(
+    //     CoordinateSystem.LNGLAT_OFFSET,
+    //   );
+    // } else {
       this.coordinateSystemService.setCoordinateSystem(CoordinateSystem.LNGLAT);
-    }
+    // }
   }
 }

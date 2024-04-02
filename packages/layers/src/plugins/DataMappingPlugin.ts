@@ -19,8 +19,8 @@ import { inject, injectable } from 'inversify';
 import { cloneDeep } from 'lodash';
 import { Map } from 'mapbox-gl';
 import 'reflect-metadata';
-import { transformToMultiCoor } from '../../../maps/src/mapbox';
 import { ILineLayerStyleOptions } from '../core/interface';
+import { transformToMultiCoor } from '../../../maps/src/mapbox';
 
 @injectable()
 export default class DataMappingPlugin implements ILayerPlugin {
@@ -33,29 +33,6 @@ export default class DataMappingPlugin implements ILayerPlugin {
   @inject(TYPES.IFontService)
   private readonly fontService: IFontService;
 
-  private mapZoom: number;
-
-  private resetLayerEncodeData(
-    layer: ILayer,
-    styleAttributeService: IStyleAttributeService,
-  ) {
-    const map = this.mapService.map;
-    if(!map) return;
-    const callback = () => {
-      if (map.getZoom() <= 12 && this.mapZoom > 12) {
-        this.apply(layer, {
-          styleAttributeService,
-        });
-      }
-      if (map.getZoom() > 12 && this.mapZoom <= 12) {
-        this.apply(layer, {
-          styleAttributeService,
-        });
-      }
-    }
-    map.off('zoomend', callback);
-    map.on('zoomend', callback);
-  }
 
   public apply(
     layer: ILayer,
@@ -227,12 +204,12 @@ export default class DataMappingPlugin implements ILayerPlugin {
     this.adjustData2SimpleCoordinates(mappedData);
 
     // ---------iclient--------调整数据，mapbox多坐标系投影转换(< 12级且是多坐标系)
-    if (
-      this.mapService.map.getZoom() < 12 &&
-      this.coordinateSystemService.getCoordinateSystem() === 1
-    ) {
+    // if (
+    //   this.mapService.map.getZoom() < 12 &&
+    //   this.coordinateSystemService.getCoordinateSystem() === 1
+    // ) {
       this.adjustData2MapboxCoordinates(mappedData);
-    }
+    // }
     return mappedData;
   }
 

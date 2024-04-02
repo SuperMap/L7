@@ -9,11 +9,11 @@ import {
   IRendererService,
   TYPES,
 } from '@antv/l7-core';
+import { Version } from '@antv/l7-maps';
 import { $window } from '@antv/l7-utils';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { isMultiCoor, transformToMultiCoor } from '../../../maps/src/mapbox';
-import { Version } from '@antv/l7-maps';
 
 /**
  * 在渲染之前需要获取当前 Shader 所需 Uniform，例如：
@@ -35,10 +35,33 @@ export default class ShaderUniformPlugin implements ILayerPlugin {
 
   @inject(TYPES.IMapService)
   private readonly mapService: IMapService;
+  private mapZoom: number;
+
+  // private resetLayerEncodeData(layer: ILayer) {
+  //   const map = this.mapService.map;
+  //   if (!map || !this.getIsMultiCoor()) return;
+  //   this.mapZoom = map.getZoom();
+  //   const callback = async () => {
+  //     const zoom = map.getZoom();
+  //     if (zoom <= 12 && this.mapZoom > 12) {
+  //       await layer.hooks.init.promise();
+  //       this.mapZoom = zoom;
+  //     }
+  //     if (zoom > 12 && this.mapZoom <= 12) {
+  //       await layer.hooks.init.promise();
+
+  //       console.log('beforeRenderData')
+  //       this.mapZoom = zoom;
+  //     }
+  //   };
+
+  //   map.off('zoom', callback);
+  //   map.on('zoom', callback);
+  // }
 
   public apply(layer: ILayer) {
     const version = this.mapService.version;
-
+    // this.resetLayerEncodeData(layer);
     let mvp = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]; // default matrix (for gaode2.x)
     let sceneCenterMercator = [0, 0];
     layer.hooks.beforeRender.tap('ShaderUniformPlugin', () => {
@@ -117,16 +140,17 @@ export default class ShaderUniformPlugin implements ILayerPlugin {
     }
   }
   private getIsMultiCoor() {
-    if( this.mapService.version !== Version['MAPBOX']) {
-      return false;
-    }
-    return isMultiCoor(this.mapService.map);
+    // if (this.mapService.version !== Version['MAPBOX']) {
+    //   return false;
+    // }
+    // return isMultiCoor(this.mapService.map);
+    return true;
   }
   private getViewportCenter() {
     const center = this.coordinateSystemService.getViewportCenter();
     const map = this.mapService.map as any;
     const TILESIZE = 512;
-    if( this.mapService.version === Version['MAPBOX']) {
+    if (this.mapService.version === Version['MAPBOX']) {
       return transformToMultiCoor(center as [number, number], map, TILESIZE);
     }
     return center;

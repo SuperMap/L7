@@ -1,0 +1,128 @@
+<!--********************************************************************
+* Copyright© 2000 - 2023 SuperMap Software Co.Ltd. All rights reserved.
+*********************************************************************-->
+<!--********************************************************************
+* 该示例需要引入 
+* G6 (https://github.com/antvis/G6)
+*********************************************************************-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>4490</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+      }
+      #map {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <link rel="stylesheet" type="text/css" href="./js/iclient-mapboxgl.css"></link>
+    <script type="text/javascript" src="https://iclient.supermap.io/web/libs/mapbox-gl-js-enhance/1.12.1-3/mapbox-gl-enhance.js"></script>
+    <script type="text/javascript" src="../mapboxgl-l7-render\dist\index.js"></script> <!-- l7-mapboxgl -->
+    <script type="text/javascript" src="./js/iclient-mapboxgl-es6.js"></script>
+  </head>
+
+  <body>
+    <div id="map"></div>
+    <script type="text/javascript">
+      var host = window.isLocal ? window.server : 'https://iserver.supermap.io';
+      var attribution =
+        "<a href='https://www.mapbox.com/about/maps/' target='_blank'>© Mapbox </a>" +
+        " with <span>© <a href='https://iclient.supermap.io' target='_blank'>SuperMap iClient</a> | </span>" +
+        " Map Data <span>© <a href='http://support.supermap.com.cn/product/iServer.aspx' target='_blank'>SuperMap iServer</a></span> ";
+
+      var url = host + '/iserver/services/map-china400/rest/maps/China_4490';
+      var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: {
+          version: 8,
+          sources: {
+            'raster-tiles': {
+              type: 'raster',
+              tileSize: 256,
+              tiles: [url],
+              rasterSource: 'iserver'
+            }
+          },
+
+          layers: [
+            {
+              id: 'simple-tiles',
+              type: 'raster',
+              source: 'raster-tiles',
+              minzoom: 0,
+              maxzoom: 22
+            }
+          ]
+        },
+        crs: 'EPSG:4490',
+        center: [108.9131417, 23.826245],
+        zoom: 18
+      });
+
+      map.on('load', () => {
+        window.map = map;
+        var data = [
+          {
+            w: 23.826245,
+            t: 24.6,
+            s: '海南',
+            l: 11,
+            m: '东方',
+            j: 108.9131417,
+            h: '59838'
+          },
+          {
+            w: 23,
+            t: 24,
+            s: '海',
+            l: 12,
+            m: '东',
+            j: 115,
+            h: '59835'
+          }
+        ];
+        var layer = new mapboxgl.supermap.L7Layer({ type: 'PointLayer' });
+        var l7Layer = layer.getL7Layer();
+        data.forEach((item) => {
+          const { j: lng, w: lat } = item;
+          // const coor = transformToMultiCoor(lng, lat, map);
+          new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
+          // item.j = coor[0];
+          // item.w = coor[1];
+        });
+        function transformToMultiCoor(lng, lat, map, WORLD_SCALE = 512) {
+          const coor = map.getCRS().fromWGS84([lng, lat]);
+          const extent = map.getCRS().getExtent();
+          const width = extent[2] - extent[0];
+          const height = extent[3] - extent[1];
+          const xScale = ((coor[0] - extent[0]) / width) * WORLD_SCALE + 0;
+          const yScale = ((extent[3] - coor[1]) / height) * WORLD_SCALE - WORLD_SCALE / 4;
+          return [xScale, yScale];
+        }
+        l7Layer
+          .source(data, {
+            parser: {
+              type: 'json',
+              x: 'j',
+              y: 'w'
+            }
+          })
+          .shape('circle')
+          .size(10)
+          .color('red');
+        // .animate(true)
+        // .active(true);
+        map.addLayer(layer);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,177 @@
+<!--********************************************************************
+* Copyright© 2000 - 2023 SuperMap Software Co.Ltd. All rights reserved.
+*********************************************************************-->
+<!--********************************************************************
+* 该示例需要引入 
+* G6 (https://github.com/antvis/G6)
+*********************************************************************-->
+<!DOCTYPE html>
+<html>
+  <link>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>2362</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+      }
+      #map {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <link rel="stylesheet" type="text/css" href="./js/iclient-mapboxgl.css"></link>
+    <script type="text/javascript" src="https://iclient.supermap.io/web/libs/mapbox-gl-js-enhance/1.12.1-3/mapbox-gl-enhance.js"></script>
+    <script type="text/javascript" src="../mapboxgl-l7-render\dist\index.js"></script> <!-- l7-mapboxgl -->
+    <script type="text/javascript" src="./js/iclient-mapboxgl-es6.js"></script>
+  </head>
+
+  <body>
+    <div id="map"></div>
+    <script type="text/javascript">
+      var host = window.isLocal ? window.server : 'https://iserver.supermap.io';
+      var attribution =
+        "<a href='https://www.mapbox.com/about/maps/' target='_blank'>© Mapbox </a>" +
+        " with <span>© <a href='https://iclient.supermap.io' target='_blank'>SuperMap iClient</a> | </span>" +
+        " Map Data <span>© <a href='http://support.supermap.com.cn/product/iServer.aspx' target='_blank'>SuperMap iServer</a></span> ";
+
+      var tileURL = host + '/iserver/services/map-china400/rest/maps/ChinaDark/zxyTileImage.png?z={z}&x={x}&y={y}';
+      // var map = new mapboxgl.Map({
+      //   container: 'map',
+      //   style: {
+      //     version: 8,
+      //     sources: {
+      //       'raster-tiles': {
+      //         attribution: attribution,
+      //         type: 'raster',
+      //         tiles: [tileURL],
+      //         tileSize: 256
+      //       }
+      //     },
+      //     layers: [
+      //       {
+      //         id: 'simple-tiles',
+      //         type: 'raster',
+      //         source: 'raster-tiles',
+      //         minzoom: 0,
+      //         maxzoom: 22
+      //       }
+      //     ]
+      //   },
+      //   pitch: 35.210526315789465,
+      //   center: [104.288144, 31.239692],
+      //   zoom: 4.4,
+      //   antialias: true
+      // });
+      mapboxgl.supermap
+        .initMap(host + '/iserver/services/map-mvt-landuse/rest/maps/landuse', {
+          type: 'vector-tile',
+          mapOptions: {
+            zoom: 12,
+            renderWorldCopies:false
+          }
+        })
+        .then(function (result) {
+          var map = result.map;
+          window.map = map;
+          var data = [
+            {
+              w: 23.8,
+              t: 24.6,
+              s: '海南',
+              l: 11,
+              m: '东方',
+              j: 108.9,
+              h: '59838'
+            },
+            {
+              w: 23.85,
+              t: 24,
+              s: '海',
+              l: 12,
+              m: '东',
+              j: 108.85,
+              h: '59835'
+            }
+          ];
+          map.on('load', () => {
+            console.log('load');
+            window.map = map;
+            var layer = new mapboxgl.supermap.L7Layer({ type: 'PointLayer' });
+            var l7Layer = layer.getL7Layer();
+            data.forEach((item) => {
+              const { j: lng, w: lat } = item;
+              const coor = transformToMultiCoor(lng, lat, map);
+              // item.j = coor[0];
+              // item.w = coor[1];
+              new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
+              console.log(coor, [lng, lat]);
+            });
+
+            function transformToMultiCoor(lng, lat, map) {
+              const coor = map.getCRS().fromWGS84([lng, lat]);
+              const extent = map.getCRS().getExtent();
+              const width = extent[2] - extent[0];
+              const height = extent[3] - extent[1];
+              const xScale = ((coor[0] - extent[0]) / width) * 512 + 0;
+              const yScale = ((extent[3] - coor[1]) / height) * 512;
+              return [xScale, yScale];
+            }
+            l7Layer
+              .source(data, {
+                parser: {
+                  type: 'json',
+                  x: 'j',
+                  y: 'w'
+                }
+              })
+              .shape('circle')
+              .size(10)
+              .color('red');
+            
+            const pointSource = {
+            type: 'geojson',
+            data: {
+              type: 'FeatureCollection',
+              features: [
+                {
+                  type: 'Feature',
+                  properties: {},
+                  geometry: {
+                    type: 'Point',
+                    coordinates: [108.9, 23.8]
+                  }
+                },
+                {
+                  type: 'Feature',
+                  properties: {},
+                  geometry: {
+                    type: 'Point',
+                    coordinates: [108.85, 23.85]
+                  }
+                }
+              ]
+            }
+          };
+
+          const layer3 = {
+            id: 'circle',
+            type: 'circle',
+            source: pointSource,
+            paint: {
+              'circle-radius': 10,
+              'circle-color': 'blue',
+              'circle-opacity': 1
+            }
+          };
+          map.addLayer(layer3);
+          map.addLayer(layer);
+          });
+        });
+    </script>
+  </body>
+</html>

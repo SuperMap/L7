@@ -10,6 +10,6 @@ export function transformToMultiCoor(lnglat, map, worldScale = 512) {
   const height = extent[3] - extent[1];
   const xScale = ((coor[0] - extent[0]) / width) * worldScales + 0;
   const yScale =
-    ((extent[3] - coor[1]) / height) * worldScales - worldScales / 4;
+    ((extent[3] - coor[1]) / height) * worldScales;
   return [xScale, yScale];
 }

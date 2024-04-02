@@ -5,8 +5,8 @@ import { createMat4, transformVector } from './math-utils';
 import * as mat4 from 'gl-matrix/mat4';
 import * as vec2 from 'gl-matrix/vec2';
 import * as vec3 from 'gl-matrix/vec3';
-import assert from './assert';
 import { transformToMultiCoor } from '../mapbox/utils';
+import assert from './assert';
 
 // CONSTANTS
 const PI = Math.PI;
@@ -29,8 +29,6 @@ export function scaleToZoom(scale) {
   return Math.log2(scale);
 }
 
-
-
 /**
  * Project [lng,lat] on sphere onto [x,y] on 512*512 Mercator Zoom 0 tile.
  * Performs the nonlinear part of the web mercator projection.
@@ -51,12 +49,13 @@ export function lngLatToWorld(
   scale *= TILE_SIZE;
   const lambda2 = lng * DEGREES_TO_RADIANS;
   const phi2 = lat * DEGREES_TO_RADIANS;
-  const x = (scale * (lambda2 + PI)) / (2 * PI);
+  let x = (scale * (lambda2 + PI)) / (2 * PI);
   // const y = scale * (PI - Math.log(Math.tan(PI_4 + phi2 * 0.5))) / (2 * PI);
   var y;
   if (isGeographicCoordinateSystem === true) {
     // y = (scale * (PI - phi2)) / (2 * PI);
-     // ---------iclient--------isGeographicCoordinateSystem
+    // ---------iclient--------isGeographicCoordinateSystem
+    x = transformToMultiCoor([lng, lat], window.map, scale)[0];
     y = transformToMultiCoor([lng, lat], window.map, scale)[1];
   } else {
     y = (scale * (PI - Math.log(Math.tan(PI_4 + phi2 * 0.5)))) / (2 * PI);
@@ -99,7 +98,7 @@ export function multiCoorLngLatToWorld([lng, lat], map) {
  *   Has toArray method if you need a GeoJSON Array.
  *   Per cartographic tradition, lat and lon are specified as degrees.
  */
- // ---------iclient--------isGeographicCoordinateSystem
+// ---------iclient--------isGeographicCoordinateSystem
 export function worldToLngLat([x, y], scale, isGeographicCoordinateSystem) {
   scale *= TILE_SIZE;
   const lambda2 = (x / scale) * (2 * PI) - PI;
