@@ -20,7 +20,7 @@ import { cloneDeep } from 'lodash';
 import { Map } from 'mapbox-gl';
 import 'reflect-metadata';
 import { ILineLayerStyleOptions } from '../core/interface';
-import { transformToMultiCoor } from '../../../maps/src/mapbox';
+import { transformToMultiCoor, isMultiCoor } from '../../../maps/src/mapbox';
 
 @injectable()
 export default class DataMappingPlugin implements ILayerPlugin {
@@ -32,7 +32,6 @@ export default class DataMappingPlugin implements ILayerPlugin {
 
   @inject(TYPES.IFontService)
   private readonly fontService: IFontService;
-
 
   public apply(
     layer: ILayer,
@@ -204,12 +203,9 @@ export default class DataMappingPlugin implements ILayerPlugin {
     this.adjustData2SimpleCoordinates(mappedData);
 
     // ---------iclient--------调整数据，mapbox多坐标系投影转换(< 12级且是多坐标系)
-    // if (
-    //   this.mapService.map.getZoom() < 12 &&
-    //   this.coordinateSystemService.getCoordinateSystem() === 1
-    // ) {
+    if (this.mapService.map.getZoom() < 12 && this.getIsMultiCoor()) {
       this.adjustData2MapboxCoordinates(mappedData);
-    // }
+    }
     return mappedData;
   }
 
@@ -265,6 +261,13 @@ export default class DataMappingPlugin implements ILayerPlugin {
       // @ts-ignore
       return coords;
     }
+  }
+
+  private getIsMultiCoor() {
+    if (this.mapService.version !== Version['MAPBOX']) {
+      return false;
+    }
+    return isMultiCoor(this.mapService.map);
   }
 
   private adjustData2Amap2Coordinates(
