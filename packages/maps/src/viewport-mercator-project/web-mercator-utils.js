@@ -153,13 +153,17 @@ export function getDistanceScales({
      pixelsPerDegreeY = d(lngLatToWorld([lng, lat])[1])/d(lat)
        = -scale * TILE_SIZE * DEGREES_TO_RADIANS / cos(lat * DEGREES_TO_RADIANS)  / (2 * PI)
    */
-  const pixelsPerDegreeX = worldSize / 360;
-  const pixelsPerDegreeY = pixelsPerDegreeX / latCosine;
+       const getLngLatExtent = window.map.getCRS().unit === 'degree'?  window.map.getCRS().extent :window.map.getCRS().getLngLatExtent();
+       const width = getLngLatExtent[2]-getLngLatExtent[0];
+       console.log('getLngLatExtent', width)
+
+  const pixelsPerDegreeX = worldSize / width;
+  const pixelsPerDegreeY = pixelsPerDegreeX;
 
   /**
    * Number of pixels occupied by one meter around current lat/lon:
    */
-  const altPixelsPerMeter = worldSize / EARTH_CIRCUMFERENCE / latCosine;
+  const altPixelsPerMeter = worldSize / EARTH_CIRCUMFERENCE;
 
   /**
    * LngLat: longitude -> east and latitude -> north (bottom left)

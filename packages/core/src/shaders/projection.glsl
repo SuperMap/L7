@@ -50,9 +50,7 @@ float project_scale(float meters) {
 
 // offset coords -> world coords
 vec4 project_offset(vec4 offset) {
-  float dy = offset.y;
-  dy = clamp(dy, -1., 1.);
-  vec3 pixels_per_unit = u_PixelsPerDegree + u_PixelsPerDegree2 * dy;
+  vec3 pixels_per_unit = u_PixelsPerDegree ;
   return vec4(offset.xyz * pixels_per_unit, offset.w);
 }
 

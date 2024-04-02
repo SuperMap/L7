@@ -25,7 +25,7 @@
       }
     </style>
     <link rel="stylesheet" type="text/css" href="./js/iclient-mapboxgl.css"></link>
-    <script type="text/javascript" src="https://iclient.supermap.io/web/libs/mapbox-gl-js-enhance/1.12.1-3/mapbox-gl-enhance.js"></script>
+    <script type="text/javascript" src="./js/mapbox-gl-enhance.js"></script>
     <script type="text/javascript" src="../mapboxgl-l7-render\dist\index.js"></script> <!-- l7-mapboxgl -->
     <script type="text/javascript" src="./js/iclient-mapboxgl-es6.js"></script>
   </head>
@@ -68,11 +68,12 @@
       //   antialias: true
       // });
       mapboxgl.supermap
-        .initMap(host + '/iserver/services/map-mvt-landuse/rest/maps/landuse', {
+        .initMap('http://172.16.14.44:8090/iserver/services/map-mvt-landuse2/rest/maps/landuse', {
           type: 'vector-tile',
           mapOptions: {
-            zoom: 12,
-            renderWorldCopies:false
+            zoom: 15,
+            renderWorldCopies:false,
+            center:[108.9,23.8]
           }
         })
         .then(function (result) {

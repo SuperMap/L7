@@ -1,3 +1,4 @@
+
 const DEGREES_TO_RADIANS = Math.PI / 180;
 const TILE_SIZE = 512;
 // Average circumference (40075 km equatorial, 40007 km meridional)
@@ -46,13 +47,20 @@ export function getDistanceScales({
    *   pixelsPerDegreeY = d(lngLatToWorld([lng, lat])[1])/d(lat)
    *     = -scale * TILE_SIZE * DEGREES_TO_RADIANS / cos(lat * DEGREES_TO_RADIANS)  / (2 * PI)
    */
-  const pixelsPerDegreeX = worldSize / 360;
-  const pixelsPerDegreeY = pixelsPerDegreeX / latCosine;
+  const getLngLatExtent = window.map.getCRS().unit === 'degree'?  window.map.getCRS().extent :window.map.getCRS().getLngLatExtent();
+  const width = getLngLatExtent[2] - getLngLatExtent[0];
+
+  // const extent = window.map.getCRS().getExtent();
+  // const width = extent[2] - extent[0];
+
+  // console.log('project',width,worldSize,getLngLatExtent,window.map.getCRS().lngLatExtent,window.map.getCRS().lngLatExtent[2]-window.map.getCRS().lngLatExtent[0])
+  const pixelsPerDegreeX = worldSize / width;
+  const pixelsPerDegreeY = pixelsPerDegreeX;
 
   /**
    * Number of pixels occupied by one meter around current lat/lon:
    */
-  const altPixelsPerMeter = worldSize / EARTH_CIRCUMFERENCE / latCosine;
+  const altPixelsPerMeter = worldSize / EARTH_CIRCUMFERENCE;
 
   /**
    * LngLat: longitude -> east and latitude -> north (bottom left)
