@@ -50,8 +50,10 @@ float project_scale(float meters) {
 
 // offset coords -> world coords
 vec4 project_offset(vec4 offset) {
-  vec3 pixels_per_unit = u_PixelsPerDegree ;
-  return vec4(offset.xyz * pixels_per_unit, offset.w);
+  float dy = offset.y;
+  dy = clamp(dy, -1., 1.);
+  vec3 pixels_per_unit = u_PixelsPerDegree;
+  return vec4(offset.xyz, offset.w);
 }
 
 vec3 project_normal(vec3 normal) {
@@ -104,9 +106,9 @@ vec4 project_position(vec4 position) {
  
   if (u_CoordinateSystem == COORDINATE_SYSTEM_LNGLAT_OFFSET
     || u_CoordinateSystem == COORDINATE_SYSTEM_P20_OFFSET) {
-    float X = position.x - u_ViewportCenter.x;
-    float Y = position.y - u_ViewportCenter.y;
-    return project_offset(vec4(X, Y, position.z, position.w));
+    //float X = position.x - u_ViewportCenter.x;
+    //float Y = position.y - u_ViewportCenter.y;
+    return project_offset(vec4(position.x, position.y, position.z, position.w));
   }
   if (u_CoordinateSystem < COORDINATE_SYSTEM_LNGLAT + 0.01 && u_CoordinateSystem >COORDINATE_SYSTEM_LNGLAT - 0.01) {
      // ---------iclient--------u_isMultiCoor

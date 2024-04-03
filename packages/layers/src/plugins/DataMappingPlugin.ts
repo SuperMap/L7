@@ -21,6 +21,8 @@ import { Map } from 'mapbox-gl';
 import 'reflect-metadata';
 import { ILineLayerStyleOptions } from '../core/interface';
 import { transformToMultiCoor, isMultiCoor } from '../../../maps/src/mapbox';
+import { getScaleByZoom } from '../../../maps/src/viewport-mercator-project';
+import EarthBloomSphereModel from '../earth/models/bloomsphere';
 
 @injectable()
 export default class DataMappingPlugin implements ILayerPlugin {
@@ -203,9 +205,10 @@ export default class DataMappingPlugin implements ILayerPlugin {
     this.adjustData2SimpleCoordinates(mappedData);
 
     // ---------iclient--------调整数据，mapbox多坐标系投影转换(< 12级且是多坐标系)
-    if (this.mapService.map.getZoom() < 12 && this.getIsMultiCoor()) {
+    // if (this.mapService.map.getZoom() < 12 && this.getIsMultiCoor()) {
+      console.log('adjustData2MapboxCoordinates')
       this.adjustData2MapboxCoordinates(mappedData);
-    }
+    // }
     return mappedData;
   }
 
@@ -230,7 +233,7 @@ export default class DataMappingPlugin implements ILayerPlugin {
     const map = this.mapService.map as Map;
     const TILESIZE = 512;
     if (typeof coordinates[0] === 'number') {
-      return transformToMultiCoor(
+      return this.transformToMultiCoor2(
         coordinates as [number, number],
         map,
         TILESIZE,
@@ -244,7 +247,7 @@ export default class DataMappingPlugin implements ILayerPlugin {
         // @ts-ignore
         const c1 = [];
         coord.map((co: any) => {
-          c1.push(transformToMultiCoor(co, map, TILESIZE));
+          c1.push(this.transformToMultiCoor2(co, map, TILESIZE));
         });
         // @ts-ignore
         coords.push(c1);
@@ -256,12 +259,45 @@ export default class DataMappingPlugin implements ILayerPlugin {
       const coords = [];
       // @ts-ignore
       coordinates.map((coord) => {
-        coords.push(transformToMultiCoor(coord, map, TILESIZE));
+        coords.push(this.transformToMultiCoor2(coord, map, TILESIZE));
       });
       // @ts-ignore
       return coords;
     }
   }
+  private getMultiCoorCoordinates(
+    coor,
+    map,
+  ) {
+    if (!coor) return;
+    const [lng, lat] = coor || [];
+    // @ts-ignore
+    return map.getCRS().fromWGS84([lng, lat]);
+  }
+  // mapboxgl多坐标系，获取extent
+  private getMultiCoorExtent(map) {
+    // @ts-ignore
+    // return map.getCRS().extent;
+    return map.getCRS().getExtent();
+  }
+  private transformToMultiCoor2(coord, map, TILESIZE) { 
+    if (this.mapService.map.getZoom() <= 12 && this.getIsMultiCoor()) {
+return transformToMultiCoor(coord, map, TILESIZE)
+    }else{
+      console.log('transformToMultiCoor2', coord, this.mapService.map.getCenter())
+      const centerM = this.getMultiCoorCoordinates([this.mapService.map.getCenter().lng,this.mapService.map.getCenter().lat], this.mapService.map);
+      const pointM = this.getMultiCoorCoordinates(coord, this.mapService.map);
+      const extent = this.getMultiCoorExtent(this.mapService.map);
+      const width = extent[2] - extent[0];
+      const height = extent[3] - extent[1];
+      const worldScales = getScaleByZoom(this.mapService.map.getZoom())
+      const X = (pointM[0] - centerM[0])/width * worldScales;
+     const Y = (centerM[1] - pointM[1])/height* worldScales;
+     console.log('result',X ,Y)
+     return [X ,Y]
+    }
+  }
+
 
   private getIsMultiCoor() {
     if (this.mapService.version !== Version['MAPBOX']) {
