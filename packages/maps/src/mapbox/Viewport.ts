@@ -9,9 +9,6 @@ export default class Viewport implements IViewport {
   public syncWithMapCamera(mapCamera: Partial<IMapCamera>) {
     const { center, zoom, pitch, bearing, viewportHeight, viewportWidth, map } =
       mapCamera;
-    // const isLngLat = zoom as number < 12;
-    // const transformFun = isLngLat && isMultiCoor(map) && transformToMultiCoor;
-
     this.map = map;
     /**
      * Deck.gl 使用的也是 Mapbox 同步相机，相机参数保持一致
@@ -26,17 +23,9 @@ export default class Viewport implements IViewport {
       zoom,
       pitch,
       bearing,
-       // ---------iclient--------isGeographicCoordinateSystem
-      isGeographicCoordinateSystem: this.getIsGeographicCoordinateSystem(map)
+      isGeographicCoordinateSystem: isMultiCoor(map),
+      map
     });
-  }
-
-  private getIsGeographicCoordinateSystem(map: any): boolean {
-    return isMultiCoor(map)
-  }
-
-  private getIsTransformCoordinates(map = this.map): boolean {
-    return isMultiCoor(map) && this.getZoom() < 12;
   }
 
   public getZoom(): number {
@@ -84,7 +73,6 @@ export default class Viewport implements IViewport {
     lngLat: [number, number],
     scale?: number | undefined,
   ): [number, number] {
-    // ---------iclient--------getIsGeographicCoordinateSystem
-    return this.viewport.projectFlat(lngLat, scale, this.getIsGeographicCoordinateSystem(this.map));
+    return this.viewport.projectFlat(lngLat, scale, isMultiCoor(this.map), this.map);
   }
 }

@@ -1,5 +1,5 @@
 export function transformToMultiCoor(lnglat, map, worldScale = 512) {
-  if (!map || !isMultiCoor(map)) {
+  if (!map) {
     return lnglat;
   }
   const zoom = map.getZoom();

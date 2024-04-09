@@ -43,6 +43,7 @@ export function lngLatToWorld(
   [lng, lat],
   scale,
   isGeographicCoordinateSystem = true,
+  map,
 ) {
   assert(Number.isFinite(lng) && Number.isFinite(scale));
   assert(Number.isFinite(lat) && lat >= -90 && lat <= 90, 'invalid latitude');
@@ -50,13 +51,10 @@ export function lngLatToWorld(
   const lambda2 = lng * DEGREES_TO_RADIANS;
   const phi2 = lat * DEGREES_TO_RADIANS;
   let x = (scale * (lambda2 + PI)) / (2 * PI);
-  // const y = scale * (PI - Math.log(Math.tan(PI_4 + phi2 * 0.5))) / (2 * PI);
   var y;
   if (isGeographicCoordinateSystem === true) {
-    // y = (scale * (PI - phi2)) / (2 * PI);
-    // ---------iclient--------isGeographicCoordinateSystem
-    x = transformToMultiCoor([lng, lat], window.map, scale)[0];
-    y = transformToMultiCoor([lng, lat], window.map, scale)[1];
+    x = transformToMultiCoor([lng, lat], map, scale)[0];
+    y = transformToMultiCoor([lng, lat], map, scale)[1];
   } else {
     y = (scale * (PI - Math.log(Math.tan(PI_4 + phi2 * 0.5)))) / (2 * PI);
   }
@@ -98,7 +96,6 @@ export function multiCoorLngLatToWorld([lng, lat], map) {
  *   Has toArray method if you need a GeoJSON Array.
  *   Per cartographic tradition, lat and lon are specified as degrees.
  */
-// ---------iclient--------isGeographicCoordinateSystem
 export function worldToLngLat([x, y], scale, isGeographicCoordinateSystem) {
   scale *= TILE_SIZE;
   const lambda2 = (x / scale) * (2 * PI) - PI;
@@ -130,6 +127,7 @@ export function getDistanceScales({
   latitude,
   longitude,
   zoom,
+  lngLatExtent,
   scale,
   highPrecision = false,
 }) {
@@ -153,10 +151,7 @@ export function getDistanceScales({
      pixelsPerDegreeY = d(lngLatToWorld([lng, lat])[1])/d(lat)
        = -scale * TILE_SIZE * DEGREES_TO_RADIANS / cos(lat * DEGREES_TO_RADIANS)  / (2 * PI)
    */
-       const getLngLatExtent = window.map.getCRS().unit === 'degree'?  window.map.getCRS().extent :window.map.getCRS().getLngLatExtent();
-       const width = getLngLatExtent[2]-getLngLatExtent[0];
-       console.log('getLngLatExtent', width)
-
+  const width = lngLatExtent[2] - lngLatExtent[0];
   const pixelsPerDegreeX = worldSize / width;
   const pixelsPerDegreeY = pixelsPerDegreeX;
 

@@ -22,6 +22,7 @@ interface IDistanceScales {
 export function getDistanceScales({
   latitude = 0,
   zoom = 0,
+  lngLatExtent=[],
   scale,
   highPrecision = false,
   flipY = false,
@@ -29,6 +30,7 @@ export function getDistanceScales({
   latitude: number;
   zoom: number;
   scale: number | undefined;
+  lngLatExtent: Array<number>;
   highPrecision: boolean;
   flipY: boolean;
 }>): IDistanceScales {
@@ -47,13 +49,7 @@ export function getDistanceScales({
    *   pixelsPerDegreeY = d(lngLatToWorld([lng, lat])[1])/d(lat)
    *     = -scale * TILE_SIZE * DEGREES_TO_RADIANS / cos(lat * DEGREES_TO_RADIANS)  / (2 * PI)
    */
-  const getLngLatExtent = window.map.getCRS().unit === 'degree'?  window.map.getCRS().extent :window.map.getCRS().getLngLatExtent();
-  const width = getLngLatExtent[2] - getLngLatExtent[0];
-
-  // const extent = window.map.getCRS().getExtent();
-  // const width = extent[2] - extent[0];
-
-  // console.log('project',width,worldSize,getLngLatExtent,window.map.getCRS().lngLatExtent,window.map.getCRS().lngLatExtent[2]-window.map.getCRS().lngLatExtent[0])
+  const width = lngLatExtent[2] - lngLatExtent[0];
   const pixelsPerDegreeX = worldSize / width;
   const pixelsPerDegreeY = pixelsPerDegreeX;
 

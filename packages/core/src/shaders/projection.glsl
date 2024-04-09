@@ -24,7 +24,6 @@ uniform vec4 u_ViewportCenterProjection;
 uniform vec3 u_PixelsPerDegree;
 uniform vec3 u_PixelsPerDegree2;
 uniform vec3 u_PixelsPerMeter;
- // ---------iclient--------u_isMultiCoor
 uniform bool u_isMultiCoor: false;
 
 uniform vec2 u_ViewportSize;
@@ -111,7 +110,6 @@ vec4 project_position(vec4 position) {
     return project_offset(vec4(position.x, position.y, position.z, position.w));
   }
   if (u_CoordinateSystem < COORDINATE_SYSTEM_LNGLAT + 0.01 && u_CoordinateSystem >COORDINATE_SYSTEM_LNGLAT - 0.01) {
-     // ---------iclient--------u_isMultiCoor
      if (u_isMultiCoor) {
       return vec4(
         position.xy * u_ZoomScale,

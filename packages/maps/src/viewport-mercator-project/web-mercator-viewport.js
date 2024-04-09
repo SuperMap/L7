@@ -1,16 +1,16 @@
 // View and Projection Matrix calculations for mapbox-js style map view properties
 import Viewport from './viewport';
 
-import {
-  zoomToScale,
-  pixelsToWorld,
-  lngLatToWorld,
-  worldToLngLat,
-  getProjectionMatrix,
-  getDistanceScales,
-  getViewMatrix
-} from './web-mercator-utils';
 import fitBounds from './fit-bounds';
+import {
+  getDistanceScales,
+  getProjectionMatrix,
+  getViewMatrix,
+  lngLatToWorld,
+  pixelsToWorld,
+  worldToLngLat,
+  zoomToScale,
+} from './web-mercator-utils';
 
 import * as vec2 from 'gl-matrix/vec2';
 
@@ -57,7 +57,8 @@ export default class WebMercatorViewport extends Viewport {
     altitude = 1.5,
     nearZMultiplier,
     farZMultiplier,
-    isGeographicCoordinateSystem
+    isGeographicCoordinateSystem,
+    map,
   } = {}) {
     // Silently allow apps to send in 0,0 to facilitate isomorphic render etc
     width = width || 1;
@@ -67,23 +68,21 @@ export default class WebMercatorViewport extends Viewport {
     // Altitude - prevent division by 0
     // TODO - just throw an Error instead?
     altitude = Math.max(0.75, altitude);
-     // ---------iclient--------isGeographicCoordinateSystem
-    var center = lngLatToWorld([longitude, latitude], scale, isGeographicCoordinateSystem);
-    
-    // // 如果是多坐标系, 且是小于12级
-    // if (transformToMultiCoor) {
-    //   center = multiCoorLngLatToWorld([longitude, latitude], map);
-    // }
+    var center = lngLatToWorld(
+      [longitude, latitude],
+      scale,
+      isGeographicCoordinateSystem,
+      map,
+    );
     center[2] = 0;
-
     const projectionMatrix = getProjectionMatrix({
       width,
       height,
       pitch,
       bearing,
       altitude,
-      nearZMultiplier: nearZMultiplier || (1 / height),
-      farZMultiplier: farZMultiplier || 1.01
+      nearZMultiplier: nearZMultiplier || 1 / height,
+      farZMultiplier: farZMultiplier || 1.01,
     });
 
     const viewMatrix = getViewMatrix({
@@ -92,10 +91,10 @@ export default class WebMercatorViewport extends Viewport {
       pitch,
       bearing,
       altitude,
-      flipY: true
+      flipY: true,
     });
 
-    super({width, height, viewMatrix, projectionMatrix});
+    super({ width, height, viewMatrix, projectionMatrix });
 
     // Save parameters
     this.latitude = latitude;
@@ -107,6 +106,11 @@ export default class WebMercatorViewport extends Viewport {
 
     this.scale = scale;
     this.center = center;
+    this.lngLatExtent = isGeographicCoordinateSystem
+      ? map.getCRS().unit === 'degree'
+        ? map.getCRS().extent
+        : map.getCRS().getLngLatExtent()
+      : [];
     this.pixelsPerMeter = getDistanceScales(this).pixelsPerMeter[2];
 
     Object.freeze(this);
@@ -123,8 +127,8 @@ export default class WebMercatorViewport extends Viewport {
    *   Specifies a point on the sphere to project onto the map.
    * @return {Array} [x,y] coordinates.
    */
-  projectFlat(lngLat, scale = this.scale, isGeographicCoordinateSystem) {
-    return lngLatToWorld(lngLat, scale, isGeographicCoordinateSystem);
+  projectFlat(lngLat, scale = this.scale, isGeographicCoordinateSystem, map) {
+    return lngLatToWorld(lngLat, scale, isGeographicCoordinateSystem, map);
   }
 
   /**
@@ -150,7 +154,7 @@ export default class WebMercatorViewport extends Viewport {
    *   Specifies a point on the screen.
    * @return {Array} [lng,lat] new map center.
    */
-  getMapCenterByLngLatPosition({lngLat, pos}) {
+  getMapCenterByLngLatPosition({ lngLat, pos }) {
     const fromLocation = pixelsToWorld(pos, this.pixelUnprojectionMatrix);
     const toLocation = lngLatToWorld(lngLat, this.scale);
 
@@ -161,8 +165,8 @@ export default class WebMercatorViewport extends Viewport {
   }
 
   // Legacy method name
-  getLocationAtPoint({lngLat, pos}) {
-    return this.getMapCenterByLngLatPosition({lngLat, pos});
+  getLocationAtPoint({ lngLat, pos }) {
+    return this.getMapCenterByLngLatPosition({ lngLat, pos });
   }
 
   /**

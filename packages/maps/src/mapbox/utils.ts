@@ -22,7 +22,7 @@ export function transformToMultiCoor(
   map: mapboxgl.Map,
   worldScale?: 512,
 ): [number, number] {
-  if (!map || !isMultiCoor(map)) {
+  if (!map) {
     return lnglat;
   }
   const zoom = map.getZoom();
@@ -41,12 +41,5 @@ export function isMultiCoor(map: any): boolean {
   if (!map) {
     return false;
   }
-  // // @ts-ignore
-  // if (mapboxgl.CRS) {
-  //   // @ts-ignore
-  //   return map.getCRS()?.epsgCode !== 'EPSG:3857';
-  // }
-
-  // return false;
   return true;
 }

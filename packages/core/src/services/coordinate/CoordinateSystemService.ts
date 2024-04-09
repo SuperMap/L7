@@ -19,11 +19,6 @@ export default class CoordinateSystemService
   @inject(TYPES.ICameraService)
   private readonly cameraService: ICameraService;
 
-  // @inject(TYPES.IMapService)
-  // // map.getCenter
-  // // @inject(TYPES.IMapService)
-  // // private readonly mapService: IMapService
-
   /**
    * 1. Web 墨卡托坐标系
    * 2. 偏移经纬度，用于解决高精度抖动问题
@@ -66,20 +61,19 @@ export default class CoordinateSystemService
    * 重新计算当前坐标系参数
    * TODO: 使用 memoize 缓存参数以及计算结果
    */
-  public refresh(offsetCenter: [number, number]): void {
+  public refresh(offsetCenter: [number, number], lngLatExtent: Array<number>): void {
     // if (!this.needRefresh) {
     //   return;
     // }
     const zoom = this.cameraService.getZoom();
     const zoomScale = this.cameraService.getZoomScale();
     const center = offsetCenter ? offsetCenter : this.cameraService.getCenter();
-    // const center = offsetCenter;
-
     // 计算像素到米以及经纬度之间的转换
     const { pixelsPerMeter, pixelsPerDegree } = getDistanceScales({
       // longitude: center[0],
       latitude: center[1],
       zoom,
+      lngLatExtent
     });
     this.viewportCenter = center;
     this.viewportCenterProjection = [0, 0, 0, 0];
@@ -94,9 +88,9 @@ export default class CoordinateSystemService
       // 继续使用相机服务计算的 VP 矩阵
       this.cameraService.setViewProjectionMatrix(undefined);
     } else if (this.coordinateSystem === CoordinateSystem.LNGLAT_OFFSET) {
-      this.calculateLnglatOffset(center, zoom);
+      this.calculateLnglatOffset(center, zoom, lngLatExtent);
     } else if (this.coordinateSystem === CoordinateSystem.P20_OFFSET) {
-      this.calculateLnglatOffset(center, zoom, zoomScale, true);
+      this.calculateLnglatOffset(center, zoom, lngLatExtent, zoomScale, true);
     }
     this.needRefresh = false;
 
@@ -131,13 +125,10 @@ export default class CoordinateSystemService
     return this.pixelsPerMeter;
   }
 
-  public getIsTransformCoordinates(): boolean {
-    return Boolean(this.cameraService.getIsTransformCoordinates && this.cameraService.getIsTransformCoordinates());
-  }
-
   private calculateLnglatOffset(
     center: [number, number],
     zoom: number,
+    lngLatExtent: Array<number>,
     scale?: number,
     flipY?: boolean,
   ) {
@@ -149,6 +140,7 @@ export default class CoordinateSystemService
     } = getDistanceScales({
       // longitude: center[0],
       latitude: center[1],
+      lngLatExtent,
       zoom,
       scale,
       flipY,

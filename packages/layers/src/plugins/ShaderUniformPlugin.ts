@@ -13,7 +13,7 @@ import { Version } from '@antv/l7-maps';
 import { $window } from '@antv/l7-utils';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { transformToMultiCoor, isMultiCoor } from '../../../maps/src/mapbox';
+import { isMultiCoor } from '../../../maps/src/mapbox';
 
 /**
  * 在渲染之前需要获取当前 Shader 所需 Uniform，例如：
@@ -35,16 +35,13 @@ export default class ShaderUniformPlugin implements ILayerPlugin {
 
   @inject(TYPES.IMapService)
   private readonly mapService: IMapService;
-  private mapZoom: number;
 
   private resetLayerEncodeData(layer: ILayer) {
     const map = this.mapService.map;
     if (!map || !this.getIsMultiCoor()) return;
-    this.mapZoom = map.getZoom();
     const callback = async () => {
       await layer.hooks.init.promise();
     };
-
     map.off('move', callback);
     map.on('move', callback);
   }
@@ -59,7 +56,12 @@ export default class ShaderUniformPlugin implements ILayerPlugin {
       const offset = layer.getLayerConfig().tileOrigin;
       // const offsetCenter = transformToMultiCoor(offset, this.mapService.map as any, 512);
       // 重新计算坐标系参数
-      this.coordinateSystemService.refresh(offset);
+      const lngLatExtent = this.getIsMultiCoor()
+        ? this.mapService.map.getCRS().unit === 'degree'
+          ? this.mapService.map.getCRS().extent
+          : this.mapService.map.getCRS().getLngLatExtent()
+        : [];
+      this.coordinateSystemService.refresh(offset, lngLatExtent);
 
       if (version === 'GAODE2.x') {
         this.setLayerCenter(layer);
@@ -85,7 +87,6 @@ export default class ShaderUniformPlugin implements ILayerPlugin {
           [CameraUniform.CameraPosition]:
             this.cameraService.getCameraPosition(),
           // 坐标系参数
-          // ---------iclient--------MultiCoor
           [CoordinateUniform.MultiCoor]: this.getIsMultiCoor(),
           [CoordinateUniform.CoordinateSystem]:
             this.coordinateSystemService.getCoordinateSystem(),
@@ -134,14 +135,5 @@ export default class ShaderUniformPlugin implements ILayerPlugin {
       return false;
     }
     return isMultiCoor(this.mapService.map);
-  }
-  private getViewportCenter() {
-    const center = this.coordinateSystemService.getViewportCenter();
-    const map = this.mapService.map as any;
-    const TILESIZE = 512;
-    if (this.mapService.version === Version['MAPBOX']) {
-      return transformToMultiCoor(center as [number, number], map, TILESIZE);
-    }
-    return center;
   }
 }
