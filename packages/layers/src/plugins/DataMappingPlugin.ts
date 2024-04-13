@@ -201,8 +201,10 @@ export default class DataMappingPlugin implements ILayerPlugin {
 
     // 调整数据兼容 SimpleCoordinates
     this.adjustData2SimpleCoordinates(mappedData);
+    if (this.mapService.map.getZoom() < 12) {
 
     this.adjustData2MapboxCoordinates(mappedData);
+  }
     return mappedData;
   }
 
@@ -256,12 +258,12 @@ export default class DataMappingPlugin implements ILayerPlugin {
     }
   }
   private project(coord: [number, number], map: Map, TILESIZE: number) {
-    if (map.getZoom() <= 12 && this.getIsMultiCoor()) {
+    // if (map.getZoom() <= 12 && this.getIsMultiCoor()) {
       return transformOffset(coord, map, TILESIZE);
-    } else {
-      const { lng, lat } = map.getCenter();
-      return transformOffset(coord, map, undefined, [lng, lat]);
-    }
+    // } else {
+    //   const { lng, lat } = map.getCenter();
+    //   return transformOffset(coord, map, undefined, [lng, lat]);
+    // }
   }
 
   private getIsMultiCoor() {

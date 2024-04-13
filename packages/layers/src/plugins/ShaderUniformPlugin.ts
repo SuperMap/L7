@@ -39,11 +39,23 @@ export default class ShaderUniformPlugin implements ILayerPlugin {
   private resetLayerEncodeData(layer: ILayer) {
     const map = this.mapService.map;
     if (!map || !this.getIsMultiCoor()) return;
+    this.mapZoom = map.getZoom();
     const callback = async () => {
-      await layer.hooks.init.promise();
+      const zoom = map.getZoom();
+      if (zoom <= 12 && this.mapZoom > 12) {
+        await layer.hooks.init.promise();
+        this.mapZoom = zoom;
+      }
+      if (zoom > 12 && this.mapZoom <= 12) {
+        await layer.hooks.init.promise();
+
+        console.log('beforeRenderData')
+        this.mapZoom = zoom;
+      }
     };
-    map.off('move', callback);
-    map.on('move', callback);
+
+    map.off('zoom', callback);
+    map.on('zoom', callback);
   }
 
   public apply(layer: ILayer) {

@@ -157,7 +157,7 @@ export default class CoordinateSystemService
 
     // 经纬度投影到 Web 墨卡托坐标系
     const positionPixels = this.cameraService.projectFlat(
-      [center[0], center[1]],
+      [Math.fround(center[0]), Math.fround(center[1])],
       Math.pow(2, zoom),
     );
 
