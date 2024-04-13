@@ -3,8 +3,8 @@ export function transformToMultiCoor(lnglat, map, worldScale = 512) {
     return lnglat;
   }
   const zoom = map.getZoom();
-  const coor = getMultiCoorCoordinates(lnglat, map);
-  const extent = getMultiCoorExtent(map);
+  const coor = fromWGS84(lnglat, map);
+  const extent = getCRSExtent(map);
   const worldScales = worldScale || getScaleByZoom(zoom);
   const width = extent[2] - extent[0];
   const height = extent[3] - extent[1];

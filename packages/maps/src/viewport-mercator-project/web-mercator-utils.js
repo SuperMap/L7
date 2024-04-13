@@ -53,8 +53,9 @@ export function lngLatToWorld(
   let x = (scale * (lambda2 + PI)) / (2 * PI);
   var y;
   if (isGeographicCoordinateSystem === true) {
-    x = transformToMultiCoor([lng, lat], map, scale)[0];
-    y = transformToMultiCoor([lng, lat], map, scale)[1];
+    const p = transformToMultiCoor([lng, lat], map, scale);
+    x = p[0];
+    y = p[1];
   } else {
     y = (scale * (PI - Math.log(Math.tan(PI_4 + phi2 * 0.5)))) / (2 * PI);
   }
