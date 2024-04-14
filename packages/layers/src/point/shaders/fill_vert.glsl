@@ -67,7 +67,7 @@ void main() {
   if(u_blur_height_fixed.z < 1.0) { // false
     raisingHeight = project_pixel(u_blur_height_fixed.y);
   } else {
-     if(u_CoordinateSystem == COORDINATE_SYSTEM_LNGLAT || u_CoordinateSystem == COORDINATE_SYSTEM_LNGLAT_OFFSET) {
+     if(u_CoordinateSystem == COORDINATE_SYSTEM_LNGLAT || u_CoordinateSystem == COORDINATE_SYSTEM_LNGLAT_OFFSET || u_CoordinateSystem == COORDINATE_SYSTEM_METER_OFFSET) {
       float mapboxZoomScale = 4.0/pow(2.0, 21.0 - u_Zoom);
       raisingHeight = u_blur_height_fixed.y * mapboxZoomScale;
     }

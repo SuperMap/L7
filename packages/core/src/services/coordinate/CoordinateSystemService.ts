@@ -88,7 +88,7 @@ export default class CoordinateSystemService
     ) {
       // 继续使用相机服务计算的 VP 矩阵
       this.cameraService.setViewProjectionMatrix(undefined);
-    } else if (this.coordinateSystem === CoordinateSystem.LNGLAT_OFFSET) {
+    } else if (this.coordinateSystem === CoordinateSystem.LNGLAT_OFFSET || this.coordinateSystem === CoordinateSystem.METER_OFFSET) {
       this.calculateLnglatOffset(center, zoom, lngLatExtent);
     } else if (this.coordinateSystem === CoordinateSystem.P20_OFFSET) {
       this.calculateLnglatOffset(center, zoom, lngLatExtent, zoomScale, true);
@@ -107,8 +107,13 @@ export default class CoordinateSystemService
   }
 
   public getViewportCenter(): [number, number] {
-    return transformOffset([Math.fround(this.viewportCenter[0]), Math.fround(this.viewportCenter[1])], window.map, 512)
-    // return this.viewportCenter;
+    // return transformOffset(this.viewportCenter, window.map, 512)
+if(this.coordinateSystem === CoordinateSystem.METER_OFFSET){
+  return transformOffset([Math.fround(this.viewportCenter[0]), Math.fround(this.viewportCenter[1])], window.map, 512)
+
+}else{
+  return [this.viewportCenter[0], this.viewportCenter[1]];
+}
   }
 
   public getViewportCenterProjection(): [number, number, number, number] {

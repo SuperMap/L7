@@ -373,13 +373,12 @@ export default abstract class BaseMapService<T>
   protected updateCoordinateSystemService() {
     const { offsetCoordinate = true } = this.config;
     // set coordinate system
-    if (
-      (this.viewport as IViewport).getZoom() > LNGLAT_OFFSET_ZOOM_THRESHOLD &&
-      offsetCoordinate
-    ) {
-      this.coordinateSystemService.setCoordinateSystem(
-        CoordinateSystem.LNGLAT_OFFSET,
-      );
+    if ((this.viewport as IViewport).getZoom() > LNGLAT_OFFSET_ZOOM_THRESHOLD && offsetCoordinate) {
+      if(this.map.getCRS().unit==='degrees' || this.map.getCRS().unit==='degree' || this.map.getCRS().epsgCode==='EPSG:3857' ){
+        this.coordinateSystemService.setCoordinateSystem(CoordinateSystem.LNGLAT_OFFSET);
+      }else{
+        this.coordinateSystemService.setCoordinateSystem(CoordinateSystem.METER_OFFSET);
+      }
     } else {
       this.coordinateSystemService.setCoordinateSystem(CoordinateSystem.LNGLAT);
     }
