@@ -52,7 +52,7 @@ vec4 project_offset(vec4 offset) {
   float dy = offset.y;
   dy = clamp(dy, -1., 1.);
   vec3 pixels_per_unit = u_PixelsPerDegree + u_PixelsPerDegree2 * dy;
-  return vec4(offset.xyz * pixels_per_unit, offset.w);
+  return vec4(offset.xyz , offset.w);
 }
 
 vec3 project_normal(vec3 normal) {
@@ -105,8 +105,8 @@ vec4 project_position(vec4 position) {
  
   if (u_CoordinateSystem == COORDINATE_SYSTEM_LNGLAT_OFFSET
     || u_CoordinateSystem == COORDINATE_SYSTEM_P20_OFFSET) {
-    float X = position.x - u_ViewportCenter.x;
-    float Y = position.y - u_ViewportCenter.y;
+    float X = (position.x - u_ViewportCenter.x)* u_ZoomScale ;
+    float Y = ( position.y - u_ViewportCenter.y)* u_ZoomScale ;
     return project_offset(vec4(X, Y, position.z, position.w));
   }
   if (u_CoordinateSystem < COORDINATE_SYSTEM_LNGLAT + 0.01 && u_CoordinateSystem >COORDINATE_SYSTEM_LNGLAT - 0.01) {

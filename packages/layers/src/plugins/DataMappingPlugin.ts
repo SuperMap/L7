@@ -201,10 +201,10 @@ export default class DataMappingPlugin implements ILayerPlugin {
 
     // 调整数据兼容 SimpleCoordinates
     this.adjustData2SimpleCoordinates(mappedData);
-    if (this.mapService.map.getZoom() < 12) {
-
+    // if (this.mapService.map.getZoom() < 12) {
+console.log('adjustData2MapboxCoordinatesadjustData2MapboxCoordinates')
     this.adjustData2MapboxCoordinates(mappedData);
-  }
+  // }
     return mappedData;
   }
 

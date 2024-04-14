@@ -8,6 +8,7 @@ import {
   CoordinateSystem,
   ICoordinateSystemService,
 } from './ICoordinateSystemService';
+import { transformOffset } from '../../../../maps/src/mapbox/utils';
 
 const VECTOR_TO_POINT_MATRIX = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0];
 
@@ -106,7 +107,8 @@ export default class CoordinateSystemService
   }
 
   public getViewportCenter(): [number, number] {
-    return this.viewportCenter;
+    return transformOffset([Math.fround(this.viewportCenter[0]), Math.fround(this.viewportCenter[1])], window.map, 512)
+    // return this.viewportCenter;
   }
 
   public getViewportCenterProjection(): [number, number, number, number] {
