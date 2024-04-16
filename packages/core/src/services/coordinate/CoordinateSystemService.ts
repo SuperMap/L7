@@ -1,6 +1,7 @@
 import { mat4, vec4 } from 'gl-matrix';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
+import { transformOffset } from '../../../../maps/src/mapbox/utils';
 import { TYPES } from '../../types';
 import { getDistanceScales } from '../../utils/project';
 import { ICameraService } from '../camera/ICameraService';
@@ -8,7 +9,6 @@ import {
   CoordinateSystem,
   ICoordinateSystemService,
 } from './ICoordinateSystemService';
-import { transformOffset } from '../../../../maps/src/mapbox/utils';
 
 const VECTOR_TO_POINT_MATRIX = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0];
 
@@ -106,14 +106,21 @@ export default class CoordinateSystemService
     this.coordinateSystem = coordinateSystem;
   }
 
-  public getViewportCenter(): [number, number] {
+  public getViewportCenter(map?: any): [number, number] {
     // return transformOffset(this.viewportCenter, window.map, 512)
-if(this.coordinateSystem === CoordinateSystem.METER_OFFSET){
-  return transformOffset([Math.fround(this.viewportCenter[0]), Math.fround(this.viewportCenter[1])], window.map, 512)
 
-}else{
-  return [this.viewportCenter[0], this.viewportCenter[1]];
-}
+    if (this.coordinateSystem === CoordinateSystem.METER_OFFSET) {
+      return transformOffset(
+        [
+          Math.fround(this.viewportCenter[0]),
+          Math.fround(this.viewportCenter[1]),
+        ],
+        map,
+        512,
+      );
+    } else {
+      return [this.viewportCenter[0], this.viewportCenter[1]];
+    }
   }
 
   public getViewportCenterProjection(): [number, number, number, number] {

@@ -45,11 +45,12 @@ export default class ShaderUniformPlugin implements ILayerPlugin {
       if (zoom <= 12 && this.mapZoom > 12) {
         await layer.hooks.init.promise();
         this.mapZoom = zoom;
+        console.log(111);
       }
       if (zoom > 12 && this.mapZoom <= 12) {
         await layer.hooks.init.promise();
+        console.log(22222);
 
-        console.log('beforeRenderData')
         this.mapZoom = zoom;
       }
     };
@@ -83,7 +84,7 @@ export default class ShaderUniformPlugin implements ILayerPlugin {
         // @ts-ignore
         sceneCenterMercator = this.mapService.getCustomCoordCenter();
       }
-
+      console.log(this.cameraService.getZoom(),  this.cameraService.getViewProjectionMatrix(),this.coordinateSystemService.getViewportCenterProjection())
       const { width, height } = this.rendererService.getViewportSize();
       layer.models.forEach((model) => {
         model.addUniforms({
@@ -103,7 +104,7 @@ export default class ShaderUniformPlugin implements ILayerPlugin {
           [CoordinateUniform.CoordinateSystem]:
             this.coordinateSystemService.getCoordinateSystem(),
           [CoordinateUniform.ViewportCenter]:
-            this.coordinateSystemService.getViewportCenter(),
+            this.coordinateSystemService.getViewportCenter(this.mapService.map),
           [CoordinateUniform.ViewportCenterProjection]:
             this.coordinateSystemService.getViewportCenterProjection(),
           [CoordinateUniform.PixelsPerDegree]:
