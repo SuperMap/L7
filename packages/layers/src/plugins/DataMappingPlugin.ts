@@ -221,8 +221,9 @@ this.adjustData2MapboxCoordinates(mappedData);
       this.mapService.version === Version['MAPBOX']
     ) {
       mappedData.map((d) => {
+        d.version = Version['MAPBOX'];
         // @ts-ignore
-        d.originCoordinates = cloneDeep(d.coordinates); // 为了兼容高德1.x 需要保存一份原始的经纬度坐标数据（许多上层逻辑依赖经纬度数据）
+        d.originCoordinates = cloneDeep(d.coordinates);
         // @ts-ignore
         d.coordinates = this.getMapboxCoordiantes(d.coordinates);
       });
