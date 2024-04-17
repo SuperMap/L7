@@ -30,7 +30,7 @@
     </style>
       <link rel="stylesheet" type="text/css" href="./js/iclient-mapboxgl.css"></link>
       <script type="text/javascript" src="https://iclient.supermap.io/web/libs/mapbox-gl-js-enhance/1.12.1-3/mapbox-gl-enhance.js"></script>
-      <script type="text/javascript" src="../mapboxgl-l7-render\dist\index.js"></script> <!-- l7-mapboxgl -->
+      <script type="text/javascript" src="../mapboxgl-l7-render/dist/index.js"></script> <!-- l7-mapboxgl -->
       <script type="text/javascript" src="./js/iclient-mapboxgl-es6.js"></script>
   </head>
 
@@ -49,6 +49,22 @@
         " Map Data <span>© <a href='http://support.supermap.com.cn/product/iServer.aspx' target='_blank'>SuperMap iServer</a></span> ";
 
       var url = host + '/iserver/services/map-china400/rest/maps/China_4610';
+      var features = {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'LineString',
+              coordinates: [
+                [100, 10],
+                [100.05, 10.05]
+              ]
+            }
+          }
+        ]
+      };
       var map = new mapboxgl.Map({
         container: 'map', // container id
         style: {
@@ -80,57 +96,137 @@
       map.on('load', () => {
         window.map = map;
         var data = [
-          {
-            w: 23.826245,
-            t: 24.6,
-            s: '海南',
-            l: 11,
-            m: '东方',
-            j: 108.9131417,
-            h: '59838'
-          },
-          // {
-          //   w: 23,
-          //   t: 24,
-          //   s: '海',
-          //   l: 12,
-          //   m: '东',
-          //   j: 115,
-          //   h: '59835'
-          // }
-        ];
-        var layer = new mapboxgl.supermap.L7Layer({ type: 'PointLayer' });
-        var l7Layer = layer.getL7Layer();
-        data.forEach((item) => {
-          const { j: lng, w: lat } = item;
-          // const coor = transformToMultiCoor(lng, lat, map);
-          new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
-          // item.j = coor[0];
-          // item.w = coor[1];
-        });
-        function transformToMultiCoor(lng, lat, map, WORLD_SCALE = 512) {
-          const coor = map.getCRS().fromWGS84([lng, lat]);
-          const extent = map.getCRS().getExtent();
-          const width = extent[2] - extent[0];
-          const height = extent[3] - extent[1];
-          const xScale = ((coor[0] - extent[0]) / width) * WORLD_SCALE + 0;
-          const yScale = ((extent[3] - coor[1]) / height) * WORLD_SCALE - WORLD_SCALE / 4;
-          return [xScale, yScale];
-        }
-        l7Layer
-          .source(data, {
-            parser: {
-              type: 'json',
-              x: 'j',
-              y: 'w'
+            {
+              w: 10,
+              t: 24.6,
+              s: '海南',
+              l: 11,
+              m: '东方',
+              j: 100,
+              h: '59838'
+            },
+            {
+              w: 10.05,
+              t: 24.6,
+              s: '海南',
+              l: 11,
+              m: '东方',
+              j: 100.05,
+              h: '59838'
             }
-          })
-          .shape('circle')
-          .size(10)
-          .color('red');
-        // .animate(true)
-        // .active(true);
-        map.addLayer(layer);
+          ];
+
+          var layer = new mapboxgl.supermap.L7Layer({ type: 'PointLayer' });
+          var l7Layer = layer.getL7Layer();
+          data.forEach((item) => {
+            const { j: lng, w: lat } = item;
+            new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
+          });
+          l7Layer
+            .source(data, {
+              parser: {
+                type: 'json',
+                x: 'j',
+                y: 'w'
+              }
+            })
+            .shape('circle')
+            .size(10)
+            .color('red');
+          const source = {
+            type: 'geojson',
+            data: features
+          };
+          const layer1 = {
+            id: 'line',
+            type: 'line',
+            source,
+            paint: {
+              'line-color': 'green',
+              'line-width': 20
+            }
+          };
+
+          const source2 = {
+            type: 'geojson',
+            data: {
+              type: 'FeatureCollection',
+              features: [
+                {
+                  type: 'Feature',
+                  properties: {},
+                  geometry: {
+                    type: 'Polygon',
+                    coordinates: [
+                      [
+                        [100.06, 10],
+                        [99.95, 10],
+                        [100.06, 10.06],
+                        [100.06, 10]
+                      ]
+                    ]
+                  }
+                }
+              ]
+            }
+          };
+          const layer2 = {
+            id: 'fill',
+            type: 'fill',
+            source: source2,
+            paint: {
+              'fill-color': 'rgba(255, 255, 0, 1)'
+            }
+          };
+          const pointSource = {
+            type: 'geojson',
+            data: {
+              type: 'FeatureCollection',
+              features: [
+                {
+                  type: 'Feature',
+                  properties: {},
+                  geometry: {
+                    type: 'Point',
+                    coordinates: [100.05, 10.05]
+                  }
+                },
+                {
+                  type: 'Feature',
+                  properties: {},
+                  geometry: {
+                    type: 'Point',
+                    coordinates: [100, 10]
+                  }
+                }
+              ]
+            }
+          };
+
+          const layer3 = {
+            id: 'circle',
+            type: 'circle',
+            source: pointSource,
+            paint: {
+              'circle-radius': 12,
+              'circle-color': 'blue',
+              'circle-opacity': 1
+            }
+          };
+          var LineLayer = new mapboxgl.supermap.L7Layer({ type: 'LineLayer' });
+          LineLayer.getL7Layer().source(source.data).color('pink').shape('line').size(6);
+
+          var polygonlayer = new mapboxgl.supermap.L7Layer({ type: 'PolygonLayer' });
+          var l7Layer3 = polygonlayer.getL7Layer();
+
+          l7Layer3.source(source2.data).color('green').shape('fill');
+
+          map.addLayer(layer);
+          // map.addLayer(layer1);
+          // map.addLayer(layer2);
+          // map.addLayer(layer3);
+          // map.addLayer(polygonlayer);
+          // map.addLayer(LineLayer);
       });
     </script>
   </body>
