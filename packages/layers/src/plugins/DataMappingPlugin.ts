@@ -156,6 +156,7 @@ export default class DataMappingPlugin implements ILayerPlugin {
       const encodeRecord: IEncodeFeature = {
         id: record._id,
         coordinates: record.coordinates,
+        originCoordinates: record.originCoordinates,
         ...preRecord,
       };
 
@@ -222,10 +223,13 @@ this.adjustData2MapboxCoordinates(mappedData);
     ) {
       mappedData.map((d) => {
         d.version = Version['MAPBOX'];
-        // @ts-ignore
-        d.originCoordinates = cloneDeep(d.coordinates);
-        // @ts-ignore
-        d.coordinates = this.getMapboxCoordiantes(d.coordinates);
+        if(!d.originCoordinates){
+ // @ts-ignore
+ d.originCoordinates = cloneDeep(d.coordinates);
+ // @ts-ignore
+ d.coordinates = this.getMapboxCoordiantes(d.coordinates);
+        }
+       
       });
     }
   }

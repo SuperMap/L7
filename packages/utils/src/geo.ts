@@ -8,6 +8,7 @@ import {
   Units,
 } from '@turf/helpers';
 import { isNumber } from './math';
+import { transformOffset } from '../../maps/src/mapbox';
 
 export type IBounds = [[number, number], [number, number]];
 
@@ -165,21 +166,21 @@ export function validateLngLat(lnglat: Point, validate: boolean): Point {
   return lnglat.length === 3 ? [lng, lat, lnglat[2]] : [lng, lat];
 }
 export function aProjectFlat(lnglat: number[]) {
-  const maxs = 85.0511287798;
-  const lat = Math.max(Math.min(maxs, lnglat[1]), -maxs);
-  const scale = 256 << 20;
-  let d = Math.PI / 180;
-  let x = lnglat[0] * d;
-  let y = lat * d;
-  y = Math.log(Math.tan(Math.PI / 4 + y / 2));
-
-  const a = 0.5 / Math.PI;
-  const b = 0.5;
-  const c = -0.5 / Math.PI;
-  d = 0.5;
-  x = scale * (a * x + b);
-  y = scale * (c * y + d);
-  return [Math.floor(x), Math.floor(y)];
+  // const maxs = 85.0511287798;
+  // const lat = Math.max(Math.min(maxs, lnglat[1]), -maxs);
+  // const scale = 256 << 20;
+  // let d = Math.PI / 180;
+  // let x = lnglat[0] * d;
+  // let y = lat * d;
+  // y = Math.log(Math.tan(Math.PI / 4 + y / 2));
+  // const a = 0.5 / Math.PI;
+  // const b = 0.5;
+  // const c = -0.5 / Math.PI;
+  // d = 0.5;
+  // x = scale * (a * x + b);
+  // y = scale * (c * y + d);
+  // return [Math.floor(x), Math.floor(y)];
+  return transformOffset(lnglat,window.map,Math.pow(2,20)*256)
 }
 export function unProjectFlat(px: number[]): [number, number] {
   const a = 0.5 / Math.PI;

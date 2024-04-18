@@ -33,7 +33,8 @@ void main() {
     vec4 project_pos = project_position(vec4(customLnglat, 0, 1.0));
     gl_Position = u_Mvp * (project_pos);
   } else {
-     vec2 lnglat = unProjectFlat(a_Pos.xy + offset);
+    // vec2 lnglat = unProjectFlat(a_Pos.xy + offset)
+     vec2 lnglat = a_Pos.xy;
     vec4 project_pos = project_position(vec4(lnglat, 0, 1.0));
     gl_Position = project_common_position_to_clipspace(project_pos);
   }

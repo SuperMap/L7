@@ -11,6 +11,19 @@ export function fromWGS84(
   // @ts-ignore
   return map.getCRS().fromWGS84([lng, lat]);
 }
+
+
+export function toWGS84(
+  coor: [number, number] | undefined,
+  map: mapboxgl.Map | maplibregl.Map,
+) {
+  if (!coor) return;
+  const [x, y] = coor || [];
+  // @ts-ignore
+  return map.getCRS().toWGS84([x, y]);
+}
+
+
 // mapboxgl多坐标系，获取extent
 export function getCRSExtent(map: mapboxgl.Map) {
   // @ts-ignore
@@ -46,6 +59,28 @@ export function transformOffset(
   const xScale = ((coor[0] - origin[0]) / width) * worldScales;
   const yScale = ((origin[1] - coor[1]) / height) * worldScales;
   return [xScale, yScale];
+}
+export function transformLnglat(
+  xy: [number, number],
+  map: mapboxgl.Map,
+  worldScale?: number,
+  targetLnglat?: [number, number],
+): [number, number] {
+  if (!map) {
+    return xy;
+  }
+
+  const zoom = map.getZoom();
+  const worldScales = worldScale || getScaleByZoom(zoom);
+  const extent = getCRSExtent(map);
+  const width = extent[2] - extent[0];
+  const height = extent[3] - extent[1];
+  const origin = targetLnglat
+    ? fromWGS84(targetLnglat, map)
+    : [extent[0], extent[3]];
+  const y = origin[1] - (((xy[1]/worldScales)) * height)
+  const x = (xy[0]/ worldScales * width) + origin[0];
+  return toWGS84([x,y], map);
 }
 
 export function isMultiCoor(map: any): boolean {
