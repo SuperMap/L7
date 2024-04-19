@@ -99,12 +99,12 @@
             }
           ];
 
-          var layer = new mapboxgl.supermap.L7Layer({ type: 'PointLayer' });
-          var l7Layer = layer.getL7Layer();
           data.forEach((item) => {
             const { j: lng, w: lat } = item;
             new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
           });
+          var layer = new mapboxgl.supermap.L7Layer({ type: 'PointLayer' });
+          var l7Layer = layer.getL7Layer();
           l7Layer
             .source(data, {
               parser: {
@@ -196,6 +196,7 @@
               'circle-opacity': 1
             }
           };
+          
           var LineLayer = new mapboxgl.supermap.L7Layer({ type: 'LineLayer' });
           LineLayer.getL7Layer().source(source.data).color('pink').shape('line').size(6);
 

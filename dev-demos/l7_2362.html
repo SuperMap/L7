@@ -85,7 +85,8 @@
         .initMap(host + '/iserver/services/map-mvt-landuse/rest/maps/landuse', {
           type: 'vector-tile',
           mapOptions: {
-            zoom: 13
+            zoom: 12,
+            pitch: 60
           }
         })
         .then(function (result) {
@@ -273,7 +274,10 @@
             createheatmap3D:()=>createheatmap3D(data, map),
             creategrid:()=>creategrid(data, map),
             creategrid3D:()=>creategrid3D(data, map),
-            createMvtLayer:()=>createMvtLayer(map)
+            createMvtLayer:()=>createMvtLayer(map),
+            createOcean: ()=>createOcean(data, map),
+            createWater: ()=>createWater(data, map),
+            createCityBuildings: ()=>createCityBuildings(data, map)
           }
         
 
@@ -287,6 +291,75 @@
           })
          
         }
+        function createCityBuildings(data, map) {
+          fetch(
+            'https://gw.alipayobjects.com/os/basement_prod/972566c5-a2b9-4a7e-8da1-bae9d0eb0117.json'
+        )
+        .then(res => res.json())
+        .then(data => {
+              var layer = new mapboxgl.supermap.L7Layer({ type: 'PolygonLayer',options:{ autoFit: true }  });
+              var l7Layer = layer.getL7Layer();
+                l7Layer
+                .source(data)
+                .shape('extrude')
+                .size(100)
+                .color('h20', [
+                  '#816CAD',
+                  '#A67FB5',
+                  '#C997C7',
+                  '#DEB8D4',
+                  '#F5D4E6',
+                  '#FAE4F1',
+                  '#FFF3FC'
+                ])
+                // .style({heightfixed: true});
+              map.addLayer(layer);
+          })
+       }
+
+        function createWater(data, map) {
+          fetch(
+            'https://gw.alipayobjects.com/os/bmw-prod/67130c6c-7f49-4680-915c-54e69730861d.json'
+        )
+        .then(data => data.json())
+        .then(({ lakeData }) => {
+              var layer = new mapboxgl.supermap.L7Layer({ type: 'PolygonLayer',options:{ autoFit: true } });
+              var l7Layer = layer.getL7Layer();
+                l7Layer
+                .source(lakeData)
+                .shape('water')
+                .color('#1E90FF')
+                .style({
+                  speed: 0.4
+                  // waterTexture: 'https://gw.alipayobjects.com/mdn/rms_816329/afts/img/A*EojwT4VzSiYAAAAAAAAAAAAAARQnAQ'
+                })
+                .animate(true);
+              map.addLayer(layer);
+          })
+       }
+
+
+        function createOcean(data, map) {
+          fetch(
+            'https://gw.alipayobjects.com/os/bmw-prod/67130c6c-7f49-4680-915c-54e69730861d.json'
+        )
+        .then(data => data.json())
+        .then(({ lakeData }) => {
+              var layer = new mapboxgl.supermap.L7Layer({ type: 'PolygonLayer',options:{ autoFit: true } });
+              var l7Layer = layer.getL7Layer();
+                l7Layer
+                .source(lakeData)
+                .shape('ocean')
+                .color('#1E90FF')
+                .style({
+                  watercolor: '#6D99A8'
+                  // watercolor: '#0f0',
+                })
+                .animate(true);
+
+              map.addLayer(layer);
+          })
+       }
 
       function create3DColumnLayer(data, map) {
           var layer = new mapboxgl.supermap.L7Layer({ type: 'PointLayer' });
@@ -551,11 +624,11 @@
           "path": [
             [
             108.9131417, 23.826245,
-              420
+              4
             ],
             [
             108.85, 23.85,
-              420
+              4
             ]
           ]
         }
@@ -687,10 +760,11 @@
           l7Layer
           .source(data)
           .shape('extrude')
-          .size(5000)
-          .color('red').style({
-            // heightfixed:true
-          });
+          .size(100)
+          .color('red')
+          // .style({
+          //   heightfixed: true
+          // });
         map.addLayer(layer);
      }
 
