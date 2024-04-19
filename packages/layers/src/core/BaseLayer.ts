@@ -1298,7 +1298,6 @@ export default class BaseLayer<ChildLayerStyleOptions = {}>
     const { vs, fs, uniforms } = this.shaderModuleService.getModule(moduleName);
     const { createModel } = this.rendererService;
     return new Promise((resolve) => {
-      // console.log(this.encodedData)
       const { attributes, elements, count } =
         this.styleAttributeService.createAttributesAndIndices(
           this.encodedData,

@@ -39,13 +39,15 @@ export function transformToMultiCoor(
 }
 
 export function transformOffset(
-  lnglat: [number, number],
+  originCoor: Array<number>,
   map: mapboxgl.Map,
   worldScale?: number,
   targetLnglat?: [number, number],
-): [number, number] {
+): Array<number> {
+  const lnglat: [number, number] = [originCoor[0], originCoor[1]];
+  const z = originCoor.slice(2);
   if (!map) {
-    return lnglat;
+    return originCoor;
   }
   const zoom = map.getZoom();
   const coor = fromWGS84(lnglat, map);
@@ -58,7 +60,7 @@ export function transformOffset(
     : [extent[0], extent[3]];
   const xScale = ((coor[0] - origin[0]) / width) * worldScales;
   const yScale = ((origin[1] - coor[1]) / height) * worldScales;
-  return [xScale, yScale];
+  return [xScale, yScale, ...z];
 }
 export function transformLnglat(
   xy: [number, number],
