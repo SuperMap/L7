@@ -43,7 +43,7 @@ void main() {
     project_pos.z = a_Position.z * a_Size;
     project_pos.z += u_raisingHeight;
 
-    if(u_CoordinateSystem == COORDINATE_SYSTEM_LNGLAT || u_CoordinateSystem == COORDINATE_SYSTEM_LNGLAT_OFFSET) {
+    if(u_CoordinateSystem == COORDINATE_SYSTEM_LNGLAT || u_CoordinateSystem == COORDINATE_SYSTEM_LNGLAT_OFFSET || u_CoordinateSystem == COORDINATE_SYSTEM_METER_OFFSET) {
       float mapboxZoomScale = 4.0/pow(2.0, 21.0 - u_Zoom);
       project_pos.z *= mapboxZoomScale;
       project_pos.z += u_raisingHeight * mapboxZoomScale;
