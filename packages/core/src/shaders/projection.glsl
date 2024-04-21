@@ -119,7 +119,7 @@ vec4 project_position(vec4 position) {
   if (u_CoordinateSystem == COORDINATE_SYSTEM_METER_OFFSET) {
     float X = (position.x - u_ViewportCenter.x)* u_ZoomScale ;
     float Y = ( position.y - u_ViewportCenter.y)* u_ZoomScale ;
-    return project_offset_meter(vec4(X, Y, position.z, position.w));
+    return project_offset_meter(vec4(X, Y, project_scale(position.z), position.w));
   }
   if (u_CoordinateSystem < COORDINATE_SYSTEM_LNGLAT + 0.01 && u_CoordinateSystem >COORDINATE_SYSTEM_LNGLAT - 0.01) {
      if (u_isMultiCoor) {
