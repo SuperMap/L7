@@ -168,6 +168,7 @@ export function createMarker(map, data1 = data) {
   l7Layer.on('click', (e) => {
     console.log('layer: ', e);
   });
+  
 }
 export var data2 = [
   {

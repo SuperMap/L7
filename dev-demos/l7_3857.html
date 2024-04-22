@@ -40,7 +40,7 @@
     </style>
    <link rel="stylesheet" type="text/css" href="./js/iclient-mapboxgl.css"></link>
    <script type="text/javascript" src="./js/mapbox-gl-enhance.js"></script>
-   <script type="text/javascript" src="../mapboxgl-l7-render/dist/index.js"></script> <!-- l7-mapboxgl -->
+   <!-- <script type="text/javascript" src="../mapboxgl-l7-render/dist/index.js"></script>  -->
    <script type="text/javascript" src="./js/iclient-mapboxgl-es6.js"></script>
     </head>
 
@@ -84,9 +84,10 @@
         .then(function (result) {
           var map = result.map;
           window.map = map;
+          new mapboxgl.Marker().setLngLat([120.148054, 30.25413]).addTo(map)
           createButtons(map)
-          createMarker(map)
-          createMarker(map, data2)
+          // createMarker(map)
+          // createMarker(map, data2)
           map.on('click', (ev) => {
             console.log(ev)
           });
