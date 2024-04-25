@@ -8,7 +8,7 @@ import {
   Units,
 } from '@turf/helpers';
 import { isNumber } from './math';
-import { transformOffset } from '../../maps/src/mapbox';
+import { transformOffset } from '../../maps/src/mapbox/utils';
 
 export type IBounds = [[number, number], [number, number]];
 
