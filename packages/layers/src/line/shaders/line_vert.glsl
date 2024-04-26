@@ -137,7 +137,7 @@ void main() {
     // mapbox -  amap
     
     // 兼容 mapbox 在线高度上的效果表现基本一致
-    if(u_CoordinateSystem == COORDINATE_SYSTEM_LNGLAT || u_CoordinateSystem == COORDINATE_SYSTEM_LNGLAT_OFFSET) {
+    if(u_CoordinateSystem == COORDINATE_SYSTEM_LNGLAT || u_CoordinateSystem == COORDINATE_SYSTEM_LNGLAT_OFFSET || u_CoordinateSystem == COORDINATE_SYSTEM_METER_OFFSET) {
       // mapbox
       // 保持高度相对不变
       float mapboxZoomScale = 4.0/pow(2.0, 21.0 - u_Zoom);

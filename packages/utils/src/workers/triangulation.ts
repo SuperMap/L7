@@ -15,7 +15,7 @@ export function LineTriangulation(feature: IEncodeFeature) {
     join: 'bevel',
   });
 
-  if (version === 'GAODE2.x') {
+  if (version === 'GAODE2.x' || version === 'MAPBOX') {
     // 处理高德2.0几何体构建
     let path1 = coordinates as number[][][] | number[][]; // 计算位置
     if (!Array.isArray(path1[0][0])) {
