@@ -74,7 +74,8 @@ export default class CoordinateSystemService
       // longitude: center[0],
       latitude: center[1],
       zoom,
-      lngLatExtent
+      lngLatExtent,
+      coordinateSystem: this.coordinateSystem
     });
     this.viewportCenter = center;
     this.viewportCenterProjection = [0, 0, 0, 0];
@@ -159,6 +160,7 @@ export default class CoordinateSystemService
       scale,
       flipY,
       highPrecision: true,
+      coordinateSystem: this.coordinateSystem
     });
 
     let viewMatrix = this.cameraService.getViewMatrix();

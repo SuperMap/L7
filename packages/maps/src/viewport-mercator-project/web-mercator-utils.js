@@ -7,6 +7,7 @@ import * as vec2 from 'gl-matrix/vec2';
 import * as vec3 from 'gl-matrix/vec3';
 import { transformToMultiCoor } from '../mapbox/utils';
 import assert from './assert';
+import { CoordinateSystem } from '@antv/l7-core';
 
 // CONSTANTS
 const PI = Math.PI;
@@ -131,6 +132,7 @@ export function getDistanceScales({
   lngLatExtent,
   scale,
   highPrecision = false,
+  coordinateSystem
 }) {
   // Calculate scale from zoom if not provided
   scale = scale !== undefined ? scale : zoomToScale(zoom);
@@ -154,7 +156,10 @@ export function getDistanceScales({
    */
   const width = lngLatExtent[2] - lngLatExtent[0];
   const pixelsPerDegreeX = worldSize / width;
-  const pixelsPerDegreeY = pixelsPerDegreeX;
+  let pixelsPerDegreeY = pixelsPerDegreeX;
+  if (coordinateSystem && coordinateSystem === CoordinateSystem.LNGLAT_OFFSET) {
+    pixelsPerDegreeY = pixelsPerDegreeY / latCosine;
+  }
 
   /**
    * Number of pixels occupied by one meter around current lat/lon:

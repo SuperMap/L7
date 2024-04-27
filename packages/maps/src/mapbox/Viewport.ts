@@ -1,6 +1,6 @@
-import { IMapCamera, IViewport } from '@antv/l7-core';
+import { CoordinateSystem, IMapCamera, IViewport } from '@antv/l7-core';
 import WebMercatorViewport from '../viewport-mercator-project/web-mercator-viewport';
-import { isMultiCoor } from './utils';
+import { getCoordinateSystem, isMultiCoor } from './utils';
 
 export default class Viewport implements IViewport {
   public viewport: WebMercatorViewport;
@@ -24,6 +24,7 @@ export default class Viewport implements IViewport {
       pitch,
       bearing,
       isGeographicCoordinateSystem: isMultiCoor(map),
+      coordinateSystem: getCoordinateSystem(map),
       map
     });
   }

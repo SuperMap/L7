@@ -26,6 +26,7 @@ import 'reflect-metadata';
 import { Version } from '../version';
 import { ISimpleMapCoord, SimpleMapCoord } from './simpleMapCoord';
 import { MapTheme } from './theme';
+import { getCoordinateSystem } from '../mapbox/utils';
 const EventMap: {
   [key: string]: any;
 } = {
@@ -373,15 +374,6 @@ export default abstract class BaseMapService<T>
   protected updateCoordinateSystemService() {
     const { offsetCoordinate = true } = this.config;
     // set coordinate system
-    if ((this.viewport as IViewport).getZoom() > LNGLAT_OFFSET_ZOOM_THRESHOLD && offsetCoordinate) {
-      const crs = this.map.getCRS();
-      if (crs && ( crs.unit==='degrees' || crs.unit==='degree' || crs.epsgCode==='EPSG:3857' )) {
-        this.coordinateSystemService.setCoordinateSystem(CoordinateSystem.LNGLAT_OFFSET);
-      }else{
-        this.coordinateSystemService.setCoordinateSystem(CoordinateSystem.METER_OFFSET);
-      }
-    } else {
-      this.coordinateSystemService.setCoordinateSystem(CoordinateSystem.LNGLAT);
-    }
+    this.coordinateSystemService.setCoordinateSystem(getCoordinateSystem(this.map, offsetCoordinate))
   }
 }

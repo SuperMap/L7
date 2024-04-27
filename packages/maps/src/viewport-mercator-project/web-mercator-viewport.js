@@ -58,6 +58,7 @@ export default class WebMercatorViewport extends Viewport {
     nearZMultiplier,
     farZMultiplier,
     isGeographicCoordinateSystem,
+    coordinateSystem,
     map,
   } = {}) {
     // Silently allow apps to send in 0,0 to facilitate isomorphic render etc
@@ -111,7 +112,9 @@ export default class WebMercatorViewport extends Viewport {
         ? map.getCRS().extent
         : map.getCRS().getLngLatExtent()
       : [];
+    this.coordinateSystem = coordinateSystem;
     this.pixelsPerMeter = getDistanceScales(this).pixelsPerMeter[2];
+    
 
     Object.freeze(this);
   }

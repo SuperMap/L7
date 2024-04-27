@@ -1,6 +1,8 @@
 import mapboxgl from 'mapbox-gl';
 import { getScaleByZoom } from '../viewport-mercator-project';
+import { CoordinateSystem } from '@antv/l7-core';
 
+const LNGLAT_OFFSET_ZOOM_THRESHOLD = 12;
 // mapboxgl多坐标系，投影计算
 export function fromWGS84(
   coor: [number, number] | undefined,
@@ -90,4 +92,19 @@ export function isMultiCoor(map: any): boolean {
     return false;
   }
   return true;
+}
+export function getCoordinateSystem(map: any, offsetCoordinate = true): boolean {
+  if (!map) {
+    return false;
+  }
+  if (map.getZoom() > LNGLAT_OFFSET_ZOOM_THRESHOLD && offsetCoordinate) {
+    const crs = map.getCRS();
+    if (crs && ( crs.unit==='degrees' || crs.unit==='degree' || crs.epsgCode==='EPSG:3857' )) {
+      return CoordinateSystem.LNGLAT_OFFSET;
+    }else{
+      return CoordinateSystem.METER_OFFSET;
+    }
+  } else {
+    return CoordinateSystem.LNGLAT;
+  }
 }

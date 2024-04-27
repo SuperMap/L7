@@ -1,3 +1,4 @@
+import { CoordinateSystem } from "../services/coordinate/ICoordinateSystemService";
 
 const DEGREES_TO_RADIANS = Math.PI / 180;
 const TILE_SIZE = 512;
@@ -26,6 +27,7 @@ export function getDistanceScales({
   scale,
   highPrecision = false,
   flipY = false,
+  coordinateSystem
 }: Partial<{
   latitude: number;
   zoom: number;
@@ -33,6 +35,7 @@ export function getDistanceScales({
   lngLatExtent: Array<number>;
   highPrecision: boolean;
   flipY: boolean;
+  coordinateSystem:CoordinateSystem
 }>): IDistanceScales {
   // Calculate scale from zoom if not provided
   scale = scale !== undefined ? scale : Math.pow(2, zoom);
@@ -51,7 +54,10 @@ export function getDistanceScales({
    */
   const width = lngLatExtent[2] - lngLatExtent[0];
   const pixelsPerDegreeX = worldSize / width;
-  const pixelsPerDegreeY = pixelsPerDegreeX;
+  let pixelsPerDegreeY = pixelsPerDegreeX;
+  if (coordinateSystem && coordinateSystem === CoordinateSystem.LNGLAT_OFFSET) {
+    pixelsPerDegreeY = pixelsPerDegreeY / latCosine;
+  }
 
   /**
    * Number of pixels occupied by one meter around current lat/lon:
