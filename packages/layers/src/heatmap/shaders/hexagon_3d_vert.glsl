@@ -38,7 +38,8 @@ void main() {
   
     gl_Position = u_Mvp * vec4(customLnglat , a_Position.z * a_Size, 1.0);
   } else {
-    vec2 lnglat = unProjectFlat(a_Pos.xy + offset); // 实际的经纬度
+    //vec2 lnglat = unProjectFlat(a_Pos.xy + offset); // 实际的经纬度
+    vec2 lnglat = a_Pos.xy;
     vec4 project_pos = project_position(vec4(lnglat, a_Position.z * a_Size, 1.0));
     
     float lightWeight = calc_lighting(project_pos);

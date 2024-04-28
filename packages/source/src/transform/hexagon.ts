@@ -16,9 +16,11 @@ export function pointToHexbin(data: IParserData, option: ITransform) {
   const { size = 10, method = 'sum' } = option;
   const pixlSize = ((size / (2 * Math.PI * R_EARTH)) * (256 << 20)) / 2;
   const screenPoints: IRawData[] = dataArray.map((point: IParseDataItem) => {
+    const originCoordinates = point.coordinates;
     const [x, y] = aProjectFlat(point.coordinates);
     return {
       ...point,
+      originCoordinates,
       coordinates: [x, y],
     };
   });
@@ -38,6 +40,7 @@ export function pointToHexbin(data: IParserData, option: ITransform) {
         [option.method]: hex[method],
         count: hex.length,
         rawData: hex,
+        originCoordinates:hex[0]?hex[0].originCoordinates:[hex.x, hex.y],
         coordinates: [hex.x, hex.y],
         _id: index,
       };
