@@ -13,6 +13,7 @@ import BaseMapService from '../utils/BaseMapService';
 import { Version } from '../version';
 import Viewport from './Viewport';
 window.mapboxgl = mapboxgl;
+import { setMap } from './mapInstance'
 
 let mapdivCount = 0;
 const MAPBOX_API_KEY =
@@ -133,6 +134,7 @@ export default class MapboxService extends BaseMapService<
         ...rest,
       });
     }
+    setMap(this.map);
     this.map.on('load', () => {
       this.handleCameraChanged();
     });
