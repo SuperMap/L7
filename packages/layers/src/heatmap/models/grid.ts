@@ -11,8 +11,8 @@ import { IHeatMapLayerStyleOptions } from '../../core/interface';
 import { HeatmapGridTriangulation } from '../../core/triangulation';
 import heatmapGridVert from '../shaders/grid_vert.glsl';
 import heatmapGridFrag from '../shaders/hexagon_frag.glsl';
-import { mat2, vec2, vec4 } from 'gl-matrix';
-import { transformLnglat, transformOffset } from '../../../../maps/src/mapbox';
+import { mat2, vec2 } from 'gl-matrix';
+import { transformLnglat, transformOffset } from '../../../../maps/src/mapbox/utils';
 export default class GridModel extends BaseModel {
   public getUninforms(): IModelUniform {
     const { opacity, coverage, angle } =

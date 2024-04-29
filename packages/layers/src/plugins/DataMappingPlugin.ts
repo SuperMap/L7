@@ -20,7 +20,7 @@ import { inject, injectable } from 'inversify';
 import { cloneDeep } from 'lodash';
 import { Map } from 'mapbox-gl';
 import 'reflect-metadata';
-import { isMultiCoor, transformOffset } from '../../../maps/src/mapbox';
+import { isMultiCoor, transformOffset } from '../../../maps/src/mapbox/utils';
 import { ILineLayerStyleOptions } from '../core/interface';
 
 @injectable()

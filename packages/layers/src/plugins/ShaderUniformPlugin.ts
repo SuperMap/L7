@@ -13,7 +13,7 @@ import { Version } from '@antv/l7-maps';
 import { $window } from '@antv/l7-utils';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { isMultiCoor } from '../../../maps/src/mapbox';
+import { isMultiCoor } from '../../../maps/src/mapbox/utils';
 
 /**
  * 在渲染之前需要获取当前 Shader 所需 Uniform，例如：
