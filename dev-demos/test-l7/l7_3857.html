@@ -60,12 +60,33 @@
           }
         ]
       };
-      mapboxgl.supermap
-        .initMap('http://172.16.14.44:8090/iserver/services/map-china400/rest/maps/China', {
-          mapOptions: { center: [100, 10], zoom: 5, antialias: true , maxZoom: 25}
-        })
-        .then(function (result) {
-          var map = result.map;
+      var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: {
+          version: 8,
+          sources: {
+            'raster-tiles': {
+              type: 'raster',
+              tileSize: 256,
+              tiles: ['https://t4.tianditu.gov.cn/vec_w/wmts?service=WMTS&request=GetTile&version=1.0.0&style=default&tilematrixSet=w&format=tiles&width=256&height=256&layer=vec&tilematrix={z}&tilerow={y}&tilecol={x}&tk=1d109683f4d84198e37a38c442d68311'],
+            }
+          },
+
+          layers: [
+            {
+              id: 'simple-tiles',
+              type: 'raster',
+              source: 'raster-tiles',
+              minzoom: 0,
+              maxzoom: 22
+            }
+          ]
+        },
+        center: [120.148054, 30.25413],
+        zoom: 11
+      });
+       
+      map.on('load',function (result) {
           window.map = map;
           var data = [
             {
@@ -197,9 +218,9 @@
           // map.addLayer(layer1);
           // map.addLayer(layer2);
           // map.addLayer(layer3);
-          // map.addLayer(polygonlayer);
+          map.addLayer(polygonlayer);
           // map.addLayer(LineLayer);
-          createMvtLayer(map)
+          // createMvtLayer(map)
           var element = document.querySelector('#testid');
           element.addEventListener('click', function () {
             l7Layer.size(50);
