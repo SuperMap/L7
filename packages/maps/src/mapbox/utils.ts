@@ -1,6 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import { getScaleByZoom } from '../viewport-mercator-project';
-import { CoordinateSystem } from '@antv/l7-core';
+import { CoordinateSystem } from "@antv/l7-core/src/services/coordinate/ICoordinateSystemService";
 
 const LNGLAT_OFFSET_ZOOM_THRESHOLD = 12;
 // mapboxgl多坐标系，投影计算

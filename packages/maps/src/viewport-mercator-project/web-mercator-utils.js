@@ -7,7 +7,7 @@ import * as vec2 from 'gl-matrix/vec2';
 import * as vec3 from 'gl-matrix/vec3';
 import { transformToMultiCoor } from '../mapbox/utils';
 import assert from './assert';
-import { CoordinateSystem } from '@antv/l7-core';
+import { CoordinateSystem } from "@antv/l7-core/src/services/coordinate/ICoordinateSystemService";
 
 // CONSTANTS
 const PI = Math.PI;
