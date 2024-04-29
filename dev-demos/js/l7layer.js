@@ -168,7 +168,6 @@ export function createMarker(map, data1 = data) {
   l7Layer.on('click', (e) => {
     console.log('layer: ', e);
   });
-  
 }
 export var data2 = [
   {
@@ -226,6 +225,15 @@ export function createButtons(map) {
     createOcean: () => createOcean(data, map),
     createWater: () => createWater(data, map),
     createCityBuildings: () => createCityBuildings(data, map),
+    createHeatMapColumn: () => createHeatMapColumn(data, map),
+    creatRain: () => creatRain(data, map),
+    // 以下几个不对
+    createHexagonColumn: () => createHexagonColumn(map),
+    createGridMap: () => createGridMap(map),
+    createCircleArc: () => createCircleArc(map),
+    createWindAnimate: () => createWindAnimate(map),
+    createLineAnimate: () => createLineAnimate(map),
+
   };
   const parentDom = document.querySelector('#buttons');
   Object.keys(btns).map((key) => {
@@ -236,6 +244,176 @@ export function createButtons(map) {
     parentDom.appendChild(btn);
   });
 }
+
+// 3d蜂窝热力图出现两条横杠
+function createHexagonColumn(map) {
+  fetch('./js/7359a5e9-3c5e-453f-b207-bc892fb23b84.csv')
+    .then((res) => res.text())
+    .then((data) => {
+      var layer = new mapboxgl.supermap.L7Layer({ type: 'HeatmapLayer' });
+      var l7Layer = layer.getL7Layer();
+      l7Layer
+        .source(data, {
+          parser: {
+            type: 'csv',
+            x: 'lng',
+            y: 'lat',
+          },
+          transforms: [
+            {
+              type: 'hexagon',
+              size: 200000,
+              field: 'v',
+              method: 'sum',
+            },
+          ],
+        })
+        .size('sum', (value) => {
+          return value * 20;
+        })
+        .shape('hexagonColumn')
+        .color(
+          'count',
+          [
+            '#FF4818',
+            '#F7B74A',
+            '#FFF598',
+            '#FF40F3',
+            '#9415FF',
+            '#421EB2',
+          ].reverse(),
+        )
+        .style({
+          coverage: 0.9,
+          angle: 0,
+        });
+      map.addLayer(layer);
+    });
+}
+// 格网地图出现两条横杠
+function createGridMap(map) {
+  fetch('./js/3dadb1f5-8f54-4449-8206-72db6e142c40.json')
+    .then((res) => res.json())
+    .then((data) => {
+      var linelayer = new mapboxgl.supermap.L7Layer({
+        type: 'HeatmapLayer',
+        options: { autoFit: true },
+      });
+      linelayer
+        .getL7Layer()
+        .source(data, {
+          transforms: [
+            {
+              type: 'hexagon',
+              size: 5 * 100000,
+            },
+          ],
+        })
+        .shape('circle')
+        .active(false)
+        .color('#aaa')
+        .style({
+          coverage: 0.7,
+          angle: 0,
+        });
+      map.addLayer(linelayer);
+    });
+}
+// 大圆弧线没绘制
+function createCircleArc(map) {
+  fetch('./js/UEXQMifxtkQlYfChpPwT.txt')
+    .then((res) => res.text())
+    .then((data) => {
+      var layer = new mapboxgl.supermap.L7Layer({ type: 'LineLayer' });
+      var l7Layer = layer.getL7Layer();
+      l7Layer
+        .source(data, {
+          parser: {
+            type: 'csv',
+            x: 'lng1',
+            y: 'lat1',
+            x1: 'lng2',
+            y1: 'lat2',
+          },
+        })
+        .size(1)
+        .shape('greatcircle')
+        .color('#8C1EB2')
+        .style({
+          opacity: 0.8,
+        });
+      map.addLayer(layer);
+    });
+}
+// 风场动画 动画效果不对
+function createWindAnimate(map) {
+  fetch('./js/7455fead-1dc0-458d-b91a-fb4cf99e701e.txt')
+    .then((res) => res.text())
+    .then((data) => {
+      var linelayer = new mapboxgl.supermap.L7Layer({
+        type: 'LineLayer',
+        options: { blend: 'normal' },
+      });
+      linelayer
+        .getL7Layer()
+        .source(data, {
+          parser: {
+            type: 'csv',
+            x: 'lng1',
+            y: 'lat1',
+            x1: 'lng2',
+            y1: 'lat2',
+          },
+        })
+        .size(1)
+        .shape('arc')
+        .color('#6495ED')
+        .animate({
+          duration: 4,
+          interval: 0.2,
+          trailLength: 0.6,
+        });
+      map.addLayer(linelayer);
+    });
+}
+// 直线动画 不显示
+function createLineAnimate(map) {
+  fetch('./js/UEXQMifxtkQlYfChpPwT.txt')
+    .then((res) => res.text())
+    .then((data) => {
+      var layer = new mapboxgl.supermap.L7Layer({
+        type: 'LineLayer',
+        options: {
+          blend: 'normal',
+        },
+      });
+      var l7Layer = layer.getL7Layer();
+      l7Layer
+        .source(data, {
+          parser: {
+            type: 'csv',
+            x: 'lng1',
+            y: 'lat1',
+            x1: 'lng2',
+            y1: 'lat2',
+          },
+        })
+        .size(1)
+        .shape('greatcircle')
+        .animate({
+          enable: true,
+          interval: 0.1,
+          trailLength: 0.5,
+          duration: 2,
+        })
+        .color('#8C1EB2')
+        .style({
+          opacity: 0.8,
+        });
+      map.addLayer(layer);
+    });
+}
+
 export function createCityBuildings(data, map) {
   fetch(
     'https://gw.alipayobjects.com/os/basement_prod/972566c5-a2b9-4a7e-8da1-bae9d0eb0117.json',
@@ -657,8 +835,8 @@ export function creatPathLine(data, map) {
       level: 2,
       number: '902',
       path: [
-        [100, 10, 420],
-        [100.05, 10.05, 420],
+        [100, 10, 4],
+        [100.05, 10.05, 4],
       ],
     },
   ];
@@ -677,6 +855,67 @@ export function creatPathLine(data, map) {
     // .style({heightfixed:true})
     .color('red');
   map.addLayer(layer);
+}
+
+export function creatRain(data, map) {
+  var layer = new mapboxgl.supermap.L7Layer({ type: 'GeometryLayer' });
+  var l7Layer = layer.getL7Layer();
+  l7Layer
+    .shape('sprite')
+    .size(10)
+    .style({
+      opacity: 0.5,
+      mapTexture: './js/A_w2SFSZJp4nIAAAAAAAAAAAAAARQnAQ.png', // rain
+      center: [120, 30],
+      spriteCount: 120,
+      spriteRadius: 10,
+      spriteTop: 2500000,
+      spriteUpdate: 20000,
+      spriteScale: 0.6,
+    });
+  map.addLayer(layer);
+}
+
+export function createHeatMapColumn(data, map) {
+  fetch('./js/513add53-dcb2-4295-8860-9e7aa5236699.json')
+    .then((res) => res.json())
+    .then((data) => {
+      var layer = new mapboxgl.supermap.L7Layer({ type: 'HeatmapLayer' });
+      var l7Layer = layer.getL7Layer();
+      l7Layer
+        .source(data, {
+          transforms: [
+            {
+              type: 'hexagon',
+              size: 100,
+              field: 'h12',
+              method: 'sum',
+            },
+          ],
+        })
+        .size('sum', [0, 600])
+        .shape('hexagonColumn')
+        .style({
+          coverage: 0.8,
+          angle: 0,
+        })
+        .color(
+          'sum',
+          [
+            '#094D4A',
+            '#146968',
+            '#1D7F7E',
+            '#289899',
+            '#34B6B7',
+            '#4AC5AF',
+            '#5FD3A6',
+            '#7BE39E',
+            '#A1EDB8',
+            '#CEF8D6',
+          ].reverse(),
+        );
+      map.addLayer(layer);
+    });
 }
 
 export function crea3dArcLine(data, map) {
