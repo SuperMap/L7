@@ -6,6 +6,8 @@ import { IGeometryLayerStyleOptions } from '../../core/interface';
 import spriteFrag from '../shaders/sprite_frag.glsl';
 import spriteVert from '../shaders/sprite_vert.glsl';
 import { throttle } from 'lodash';
+import { transformOffset } from '../../../../maps/src/mapbox/utils';
+import { CoordinateSystem } from "../../../../core/src/services/coordinate/ICoordinateSystemService";
 
 enum SPRITE_ANIMATE_DIR {
   'UP' = 'up',
@@ -26,6 +28,7 @@ export default class SpriteModel extends BaseModel {
     const indices = [];
     const positions = [];
     const mapService = this.mapService;
+    const coordinateSystem = this.coordinateSystemService.getCoordinateSystem();
     const heightLimit =
       this.spriteAnimate === SPRITE_ANIMATE_DIR.UP
         ? -this.spriteTop
@@ -49,6 +52,11 @@ export default class SpriteModel extends BaseModel {
           number,
           number,
         ];
+        return [a, b, z, 0, 0];
+        
+      } else if (mapService.version === Version['MAPBOX'] && (coordinateSystem === CoordinateSystem.LNGLAT || coordinateSystem === CoordinateSystem.METER_OFFSET)) {
+        // @ts-ignore
+        const [a, b] = transformOffset([x + lng, -y + lat], mapService.map, 512);
         return [a, b, z, 0, 0];
       } else {
         return [x + lng, -y + lat, z, 0, 0];

@@ -14,6 +14,7 @@ import {
   ILayerModel,
   ILayerService,
   IMapService,
+  ICoordinateSystemService,
   IModel,
   IModelUniform,
   IPickingService,
@@ -115,6 +116,7 @@ export default class BaseModel<ChildLayerStyleOptions = {}>
   protected fontService: IFontService;
   protected styleAttributeService: IStyleAttributeService;
   protected mapService: IMapService;
+  protected coordinateSystemService: ICoordinateSystemService;
   protected cameraService: ICameraService;
   protected layerService: ILayerService;
   protected pickingService: IPickingService;
@@ -138,6 +140,7 @@ export default class BaseModel<ChildLayerStyleOptions = {}>
       .getContainer()
       .get<IStyleAttributeService>(TYPES.IStyleAttributeService);
     this.mapService = layer.getContainer().get<IMapService>(TYPES.IMapService);
+    this.coordinateSystemService= layer.getContainer().get<ICoordinateSystemService>(TYPES.ICoordinateSystemService);
     this.iconService = layer
       .getContainer()
       .get<IIconService>(TYPES.IIconService);
