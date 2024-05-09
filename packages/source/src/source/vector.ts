@@ -1,7 +1,11 @@
-import { VectorTile } from '@mapbox/vector-tile';
 import { Feature, Properties } from '@turf/helpers';
 import Protobuf from 'pbf';
 import { ITileSource } from '../interface';
+import { toLngLat } from '../../../maps/src/mapbox/utils'
+import { global } from '../../../maps/src/mapbox/mapInstance'
+
+const VectorTile = window.mapboxgl.mapbox.VectorTile;
+
 export default class VectorSource implements ITileSource {
   private vectorTile: VectorTile;
   private vectorLayerCache: {
@@ -41,7 +45,12 @@ export default class VectorSource implements ITileSource {
     const features: Array<Feature<GeoJSON.Geometry, Properties>> = [];
     for (let i = 0; i < vectorTile.length; i++) {
       const vectorTileFeature = vectorTile.feature(i);
-      const feature = vectorTileFeature.toGeoJSON(this.x, this.y, this.z);
+      // const toLngLat = map.getCRS().toWGS84
+      const toLngLat1 = function (x, y) {
+        const forward = toLngLat([x, y], global.map)
+        return forward;
+    };
+      const feature = vectorTileFeature.toGeoJSON(this.x, this.y, this.z, toLngLat1);
 
       features.push({
         ...feature,

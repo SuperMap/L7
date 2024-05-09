@@ -1,6 +1,6 @@
 import mapboxgl from 'mapbox-gl';
+import { CoordinateSystem } from '../../../core/src/services/coordinate/ICoordinateSystemService';
 import { getScaleByZoom } from '../viewport-mercator-project';
-import { CoordinateSystem } from "../../../core/src/services/coordinate/ICoordinateSystemService";
 
 const LNGLAT_OFFSET_ZOOM_THRESHOLD = 12;
 // mapboxgl多坐标系，投影计算
@@ -14,7 +14,6 @@ export function fromWGS84(
   return map.getCRS().fromWGS84([lng, lat]);
 }
 
-
 export function toWGS84(
   coor: [number, number] | undefined,
   map: mapboxgl.Map | maplibregl.Map,
@@ -23,6 +22,16 @@ export function toWGS84(
   const [x, y] = coor || [];
   // @ts-ignore
   return map.getCRS().toWGS84([x, y]);
+}
+export function toLngLat(
+  coor: [number, number] | undefined,
+  map: mapboxgl.Map | maplibregl.Map,
+) {
+  if (!coor) return;
+  const [x, y] = coor || [];
+  // @ts-ignore
+ const {lng, lat}= map.getCRS().toLngLat(x, y);
+ return [lng, lat];
 }
 
 
@@ -82,9 +91,9 @@ export function transformLnglat(
   const origin = targetLnglat
     ? fromWGS84(targetLnglat, map)
     : [extent[0], extent[3]];
-  const y = origin[1] - (((xy[1]/worldScales)) * height)
-  const x = (xy[0]/ worldScales * width) + origin[0];
-  return toWGS84([x,y], map);
+  const y = origin[1] - (xy[1] / worldScales) * height;
+  const x = (xy[0] / worldScales) * width + origin[0];
+  return toWGS84([x, y], map);
 }
 
 export function isMultiCoor(map: any): boolean {
@@ -93,18 +102,45 @@ export function isMultiCoor(map: any): boolean {
   }
   return true;
 }
-export function getCoordinateSystem(map: any, offsetCoordinate = true): boolean {
+export function getCoordinateSystem(
+  map: any,
+  offsetCoordinate = true,
+): boolean {
   if (!map) {
     return false;
   }
   if (map.getZoom() > LNGLAT_OFFSET_ZOOM_THRESHOLD && offsetCoordinate) {
     const crs = map.getCRS();
-    if (crs && ( crs.unit==='degrees' || crs.unit==='degree' || crs.epsgCode==='EPSG:3857' )) {
+    if (
+      crs &&
+      (crs.unit === 'degrees' ||
+        crs.unit === 'degree' ||
+        crs.epsgCode === 'EPSG:3857')
+    ) {
       return CoordinateSystem.LNGLAT_OFFSET;
-    }else{
+    } else {
       return CoordinateSystem.METER_OFFSET;
     }
   } else {
     return CoordinateSystem.LNGLAT;
   }
+}
+// 当前级别一张瓦片代表的地理宽度
+function getResolutionRatio(zoom:number, map: mapboxgl.Map) {
+  const extent = getCRSExtent(map);
+  const width = extent[2] - extent[0];
+  const height = extent[3] - extent[1];
+  const ratio_0 = Math.max(width, height) / 512;
+  const ratio = ratio_0 / Math.pow(2, zoom);
+  return ratio * 512;
+}
+export function getTileXY(lnglat: [number, number], z:number, map: mapboxgl.Map) {
+  // 当前级别一张瓦片代表的地理宽度
+  const ratio = getResolutionRatio(z, map);
+  const extent = getCRSExtent(map);
+  const [x, y] = fromWGS84(lnglat, map);
+
+  const tileX = (x - extent[0]) / ratio;
+  const tileY = (extent[3] - y) / ratio;
+  return [Math.floor(tileX), Math.floor(tileY)];
 }

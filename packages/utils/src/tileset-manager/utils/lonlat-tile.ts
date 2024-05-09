@@ -1,5 +1,6 @@
 import { DEFAULT_EXTENT } from '../const';
 import { TileBounds } from '../types';
+import { getTileXY } from '../.../../../../../maps/src/mapbox/utils'
 
 // // https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#ECMAScript_.28JavaScript.2FActionScript.2C_etc..29
 export function osmLonLat2TileXY(lon: number, lat: number, zoom: number) {
@@ -47,6 +48,7 @@ export function getTileIndices({
   minZoom = 0,
   zoomOffset = 0,
   extent = DEFAULT_EXTENT,
+  map
 }: {
   zoom: number;
   latLonBounds: TileBounds;
@@ -66,7 +68,6 @@ export function getTileIndices({
   if (Number.isFinite(maxZoom) && z > maxZoom) {
     z = maxZoom;
   }
-
   const [minLng, minLat, maxLng, maxLat] = latLonBounds;
   const bounds = [
     Math.max(minLng, extent[0]),
@@ -77,8 +78,10 @@ export function getTileIndices({
 
   const indices = [];
 
-  const [minX, maxY] = osmLonLat2TileXY(bounds[0], bounds[1], z);
-  const [maxX, minY] = osmLonLat2TileXY(bounds[2], bounds[3], z);
+  // const [minX, maxY] = osmLonLat2TileXY(bounds[0], bounds[1], z);
+  // const [maxX, minY] = osmLonLat2TileXY(bounds[2], bounds[3], z);
+  const [minX, maxY] = getTileXY([bounds[0], bounds[1]], z, map);
+  const [maxX, minY] = getTileXY([bounds[2], bounds[3]], z, map);
 
   for (let x = minX; x <= maxX; x++) {
     for (let y = minY; y <= maxY; y++) {

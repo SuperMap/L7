@@ -52,6 +52,7 @@ export class TilesetManager extends EventEmitter {
     latLonBounds: [number, number, number, number];
     latLonBoundsBuffer: [number, number, number, number];
   };
+  private map: any;
 
   constructor(options: Partial<TilesetManagerOptions>) {
     super();
@@ -88,10 +89,12 @@ export class TilesetManager extends EventEmitter {
 
   // 更新
   // 1.瓦片序号发生改变 2.瓦片新增 3.瓦片显隐控制
-  public update(zoom: number, latLonBounds: [number, number, number, number]) {
+  public update(zoom: number, latLonBounds: [number, number, number, number], map?: any) {
     // 校验层级，向上取整
     const verifyZoom = Math.max(0, Math.ceil(zoom));
-
+    if(map) {
+      this.map = map;
+    }
     if (
       this.lastViewStates &&
       this.lastViewStates.zoom === verifyZoom &&
@@ -311,6 +314,7 @@ export class TilesetManager extends EventEmitter {
       zoom,
       latLonBounds,
       extent,
+      map: this.map
     });
 
     return indices;

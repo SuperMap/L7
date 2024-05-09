@@ -72,7 +72,7 @@ export default class BaseTileLayer {
     }
 
     const { latLonBounds, zoom } = this.getCurrentView();
-    this.tilesetManager?.update(zoom, latLonBounds);
+    this.tilesetManager?.update(zoom, latLonBounds, this.getMap());
   }
   protected mapchange = () => {
     const { latLonBounds, zoom } = this.getCurrentView();
@@ -110,6 +110,10 @@ export default class BaseTileLayer {
     const zoom = this.mapService.getZoom();
 
     return { latLonBounds, zoom };
+  }
+
+  getMap() {
+    return this.mapService.map;
   }
 
   private bindTilesetEvent() {
