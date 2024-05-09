@@ -35,7 +35,7 @@ export default class LayerService
 
   private sceneInited: boolean = false;
 
-  private animateInstanceCount: number = 0;
+  private animateInstanceCount: object = {};
 
   // TODO: 是否开启 shader 中的颜色拾取计算
   private shaderPicking: boolean = true;
@@ -289,16 +289,19 @@ export default class LayerService
   }
 
   public startAnimate(id: any) {
-    if (this.animateInstanceCount++ === 0) {
+    this.animateInstanceCount[id] = this.animateInstanceCount[id] || 0
+    if (this.animateInstanceCount[id]++ === 0) {
+      console.log('startAnimate', id)
       this.clock.start();
       this.runRender(id);
     }
   }
 
   public stopAnimate() {
-    if (--this.animateInstanceCount === 0) {
+    if (--this.animateInstanceCount[id] === 0) {
       this.stopRender();
       this.clock.stop();
+      delete this.animateInstanceCount[id];
     }
   }
 
