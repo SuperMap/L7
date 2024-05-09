@@ -235,6 +235,7 @@ export function createButtons(map, scene) {
     createLineAnimate: () => createLineAnimate(map),
     addChart: () => addChart(scene),
     createOD: () => createOD(map, scene),
+    createOD_MS: () => createOD_MS(map, scene),
   };
   const parentDom = document.querySelector('#buttons');
   Object.keys(btns).map((key) => {
@@ -320,7 +321,7 @@ function createGridMap(map) {
       map.addLayer(linelayer);
     });
 }
-// 大圆弧线没绘制
+// 大圆航线没绘制
 function createCircleArc(map) {
   fetch('./js/UEXQMifxtkQlYfChpPwT.txt')
     .then((res) => res.text())
@@ -518,6 +519,44 @@ function createOD(map, scene) {
     map.addLayer(flyLine2);
     map.addLayer(flyLine);
   });
+}
+
+// OD图
+function createOD_MS(map, scene) {
+  scene.addImage(
+    'plane',
+    'https://gw.alipayobjects.com/zos/bmw-prod/0ca1668e-38c2-4010-8568-b57cb33839b9.svg',
+  );
+
+  fetch(
+    './datas/flight.json',
+  )
+    .then((d) => d.json())
+    .then((data) => {
+      var worldLine = new mapboxgl.supermap.L7Layer({ type: 'LineLayer' });
+      var l7Layer = worldLine.getL7Layer();
+      l7Layer
+        .source({
+          data,
+          parser: {
+            type: 'json',
+            x: 'X',
+            y: 'Y',
+            x1: '到达城市x',
+            y1: '到达城市y',
+          },
+        })
+        .shape('greatcircle')
+        .color('#ff6b34')
+        .size(1)
+        .style({
+          lineType: 'dash',
+          dashArray: [1, 0],
+          opacity: 1,
+          segmentNumber: 30,
+        });
+      map.addLayer(worldLine);
+    });
 }
 
 export function createCityBuildings(data, map) {
