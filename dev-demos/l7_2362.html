@@ -212,29 +212,7 @@
             var polygonlayer = new mapboxgl.supermap.L7Layer({ type: 'PolygonLayer' });
             var l7Layer3 = polygonlayer.getL7Layer();
             l7Layer3.source(source2.data).color('red').shape('fill');
-            createButtons(data, source, source2)
-            // creatIconPoint(data, map)
-            // creaWallLine(source.data, map)
-            // creatTextPolygon(source2.data, map)
-  
-            // create3DColumnLayer(data, map)
-            // createAnimatePoint(data, map)
-            // createShpePoint(data, map)
-            // creatRadarPoint(data, map)
-            // creatTextPoint(data, map)
 
-            // creatImagePoint(data, map)
-            // creatPathLine(data, map)
-            // crea3dArcLine(data, map)
-            // creahighLine(source.data, map)
-        
-            // crea3DExtrude(source2.data, map)
-
-            // createHeat(data, map)
-            // createheatmap3D(data, map)
-            // creategrid(data, map)
-            // creategrid3D(data, map)
-            // createMvtLayer(map)
 
             map.addLayer(layer);
             // map.addLayer(polygonlayer);
@@ -243,10 +221,8 @@
               scene.on('click', (ev) => {
                 console.log(ev)
               });
-              // scene.fitBounds([
-              //   [112, 32],
-              //   [114, 35],
-              // ]);
+              createButtons(data, source, source2, scene)
+
             })
             l7Layer.on('click', (e) => {
               console.log('layer: ',e)
@@ -255,7 +231,7 @@
           });
          
       });
-      function createButtons(data, source, source2) {
+      function createButtons(data, source, source2, scene) {
         const btns = {
             creatIconPoint:()=>creatIconPoint(data, map),
             creaWallLine:()=>creaWallLine(source.data, map),
@@ -277,7 +253,8 @@
             createMvtLayer:()=>createMvtLayer(map),
             createOcean: ()=>createOcean(data, map),
             createWater: ()=>createWater(data, map),
-            createCityBuildings: ()=>createCityBuildings(data, map)
+            createCityBuildings: ()=>createCityBuildings(data, map),
+            createOD: () => createOD(map, scene),
           }
         
 
@@ -291,6 +268,111 @@
           })
          
         }
+
+        // OD图
+function createOD(map, scene) {
+  scene.addImage(
+    'plane',
+    'https://gw.alipayobjects.com/zos/bmw-prod/0ca1668e-38c2-4010-8568-b57cb33839b9.svg',
+  );
+  Promise.all([
+    fetch(
+      'https://gw.alipayobjects.com/os/bmw-prod/2960e1fc-b543-480f-a65e-d14c229dd777.json',
+    ).then((d) => d.json()),
+    fetch(
+      'https://gw.alipayobjects.com/os/basement_prod/4472780b-fea1-4fc2-9e4b-3ca716933dc7.json',
+    ).then((d) => d.text()),
+    fetch(
+      'https://gw.alipayobjects.com/os/basement_prod/a5ac7bce-181b-40d1-8a16-271356264ad8.json',
+    ).then((d) => d.text()),
+  ]).then(function onLoad([world, dot, flyline]) {
+    const dotData = eval(dot);
+    // @ts-ignore
+    const flydata = eval(flyline).map((item) => {
+      // @ts-ignore
+      const latlng1 = item.from.split(',').map((e) => {
+        return e * 1;
+      });
+      // @ts-ignore
+      const latlng2 = item.to.split(',').map((e) => {
+        return e * 1;
+      });
+      return { coord: [latlng1, latlng2] };
+    });
+
+    var worldLine = new mapboxgl.supermap.L7Layer({ type: 'LineLayer' });
+    var l7Layer = worldLine.getL7Layer();
+    l7Layer.source(world).color('#41fc9d').size(0.5).style({
+      opacity: 0.4,
+    });
+
+    var dotPoint = new mapboxgl.supermap.L7Layer({ type: 'PointLayer' });
+    dotPoint
+      .getL7Layer()
+      .source(dotData, {
+        parser: {
+          type: 'json',
+          x: 'lng',
+          y: 'lat',
+        },
+      })
+      .shape('circle')
+      .color('#ffed11')
+      .animate(true)
+      .size(40);
+
+    var flyLine = new mapboxgl.supermap.L7Layer({
+          type: 'LineLayer',
+          options: { blend: 'normal' },
+        });
+        flyLine
+          .getL7Layer()
+          .source(flydata, {
+            parser: {
+              type: 'json',
+              coordinates: 'coord',
+            },
+          })
+          .color('#ff6b34')
+          .texture('plane')
+          .shape('arc')
+          .size(15)
+          .animate({
+            duration: 1,
+            interval: 0.2,
+            trailLength: 0.05,
+          })
+          .style({
+            textureBlend: 'replace',
+            lineTexture: true, // 开启线的贴图功能
+            iconStep: 10, // 设置贴图纹理的间距
+          });
+        var flyLine2 = new mapboxgl.supermap.L7Layer({
+          type: 'LineLayer',
+          options: { blend: 'normal' },
+        });
+        flyLine2
+          .getL7Layer()
+          .source(flydata, {
+            parser: {
+              type: 'json',
+              coordinates: 'coord',
+            },
+          })
+          .color('#ff6b34')
+          .shape('arc')
+          .size(1)
+          .style({
+            lineType: 'dash',
+            dashArray: [5, 5],
+            opacity: 0.5,
+          });
+        map.addLayer(worldLine);
+        map.addLayer(dotPoint);
+        map.addLayer(flyLine2);
+        map.addLayer(flyLine);
+      });
+    }
         function createCityBuildings(data, map) {
           fetch(
             'https://gw.alipayobjects.com/os/basement_prod/972566c5-a2b9-4a7e-8da1-bae9d0eb0117.json'
