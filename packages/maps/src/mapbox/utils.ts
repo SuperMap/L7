@@ -30,10 +30,9 @@ export function toLngLat(
   if (!coor) return;
   const [x, y] = coor || [];
   // @ts-ignore
- const {lng, lat}= map.getCRS().toLngLat(x, y);
- return [lng, lat];
+  const { lng, lat } = map.getCRS().toLngLat(x, y);
+  return [lng, lat];
 }
-
 
 // mapboxgl多坐标系，获取extent
 export function getCRSExtent(map: mapboxgl.Map) {
@@ -69,8 +68,17 @@ export function transformOffset(
   const origin = targetLnglat
     ? fromWGS84(targetLnglat, map)
     : [extent[0], extent[3]];
-  const xScale = ((coor[0] - origin[0]) / width) * worldScales;
-  const yScale = ((origin[1] - coor[1]) / height) * worldScales;
+
+  let xTo1 = (coor[0] - origin[0]) / width;
+  if (lnglat[0] > 180) {
+    xTo1 += 1;
+  }
+  if (lnglat[0] < -180) {
+    xTo1 -= 1;
+  }
+  const yTo1 = (origin[1] - coor[1]) / height;
+  const xScale = xTo1 * worldScales;
+  const yScale = yTo1 * worldScales;
   return [xScale, yScale, ...z];
 }
 export function transformLnglat(
@@ -92,8 +100,16 @@ export function transformLnglat(
     ? fromWGS84(targetLnglat, map)
     : [extent[0], extent[3]];
   const y = origin[1] - (xy[1] / worldScales) * height;
-  const x = (xy[0] / worldScales) * width + origin[0];
-  return toWGS84([x, y], map);
+  const xto1 = xy[0] / worldScales;
+  const x = xto1 * width + origin[0];
+  const lnglat = toWGS84([x, y], map);
+  if (xto1 > 1) {
+    lnglat[0] += 360;
+  }
+  if (xto1 < 0) {
+    lnglat[0] -= 360;
+  }
+  return lnglat;
 }
 
 export function isMultiCoor(map: any): boolean {
@@ -126,7 +142,7 @@ export function getCoordinateSystem(
   }
 }
 // 当前级别一张瓦片代表的地理宽度
-function getResolutionRatio(zoom:number, map: mapboxgl.Map) {
+function getResolutionRatio(zoom: number, map: mapboxgl.Map) {
   const extent = getCRSExtent(map);
   const width = extent[2] - extent[0];
   const height = extent[3] - extent[1];
@@ -134,7 +150,11 @@ function getResolutionRatio(zoom:number, map: mapboxgl.Map) {
   const ratio = ratio_0 / Math.pow(2, zoom);
   return ratio * 512;
 }
-export function getTileXY(lnglat: [number, number], z:number, map: mapboxgl.Map) {
+export function getTileXY(
+  lnglat: [number, number],
+  z: number,
+  map: mapboxgl.Map,
+) {
   // 当前级别一张瓦片代表的地理宽度
   const ratio = getResolutionRatio(z, map);
   const extent = getCRSExtent(map);
