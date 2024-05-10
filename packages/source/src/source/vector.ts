@@ -1,10 +1,10 @@
 import { Feature, Properties } from '@turf/helpers';
+import { VectorTile } from '@mapbox/vector-tile';
 import Protobuf from 'pbf';
 import { ITileSource } from '../interface';
 import { toLngLat } from '../../../maps/src/mapbox/utils'
 import { global } from '../../../maps/src/mapbox/mapInstance'
 
-const VectorTile = window.mapboxgl.mapbox.VectorTile;
 
 export default class VectorSource implements ITileSource {
   private vectorTile: VectorTile;
@@ -19,7 +19,8 @@ export default class VectorSource implements ITileSource {
     this.x = x;
     this.y = y;
     this.z = z;
-    this.vectorTile = new VectorTile(new Protobuf(data)) as VectorTile;
+    const MultiVectorTile = window.mapboxgl.mapbox.VectorTile;
+    this.vectorTile = new MultiVectorTile(new Protobuf(data)) as VectorTile;
   }
 
   public getTileData(sourceLayer: string) {
