@@ -720,7 +720,7 @@ export interface ILayerService {
   add(layer: ILayer): void;
   initLayers(): Promise<void>;
   startAnimate(id: string): void;
-  stopAnimate(): void;
+  stopAnimate(id?: string): void;
   getSceneInited(): boolean;
   getLayers(): ILayer[];
   getRenderList(): ILayer[];

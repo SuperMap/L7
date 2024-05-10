@@ -31,7 +31,7 @@ export default class LayerService
 
   private layerList: ILayer[] = [];
 
-  private layerRenderID: number;
+  private layerRenderID: object = {};
 
   private sceneInited: boolean = false;
 
@@ -291,15 +291,25 @@ export default class LayerService
   public startAnimate(id: any) {
     this.animateInstanceCount[id] = this.animateInstanceCount[id] || 0
     if (this.animateInstanceCount[id]++ === 0) {
-      console.log('startAnimate', id)
       this.clock.start();
       this.runRender(id);
     }
   }
+  private stopAllAnimate() {
+    this.layerList.forEach(item => {
+      this.stopRender(item.id);
+    })
+    this.clock.stop();
+    this.animateInstanceCount= {};
+  }
 
-  public stopAnimate() {
+  public stopAnimate(id: any) {
+    if (!id) {
+      this.stopAllAnimate();
+      return;
+    }
     if (--this.animateInstanceCount[id] === 0) {
-      this.stopRender();
+      this.stopRender(id);
       this.clock.stop();
       delete this.animateInstanceCount[id];
     }
@@ -339,12 +349,12 @@ export default class LayerService
 
   private runRender(id: any) {
     this.renderLayer(id);
-    this.layerRenderID = $window.requestAnimationFrame(() => {
+    this.layerRenderID[id] = $window.requestAnimationFrame(() => {
       this.runRender(id);
     });
   }
 
-  private stopRender() {
-    $window.cancelAnimationFrame(this.layerRenderID);
+  private stopRender(id: any) {
+    $window.cancelAnimationFrame(this.layerRenderID[id]);
   }
 }
