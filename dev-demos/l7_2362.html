@@ -38,8 +38,10 @@
       }
     </style>
     <link rel="stylesheet" type="text/css" href="./js/iclient-mapboxgl.css"></link>
-    <script type="text/javascript" src="./js/mapbox-gl-enhance.js"></script>
-    <script type="text/javascript" src="../mapboxgl-l7-render/dist/index.js"></script> <!-- l7-mapboxgl -->
+    <script src="https://cdn.jsdelivr.net/npm/@antv/g2@4.2.8/dist/g2.min.js"></script>
+
+    <script type="text/javascript" src="https://iclient.supermap.io/web/libs/mapbox-gl-js-enhance/1.12.1-3/mapbox-gl-enhance.js"></script>
+    <script type="text/javascript" src="./dist/index.js"></script> <!-- l7-mapboxgl -->
     <script type="text/javascript" src="./js/iclient-mapboxgl-es6.js"></script>
   </head>
 
@@ -54,39 +56,12 @@
         " Map Data <span>© <a href='http://support.supermap.com.cn/product/iServer.aspx' target='_blank'>SuperMap iServer</a></span> ";
 
       var tileURL = host + '/iserver/services/map-china400/rest/maps/ChinaDark/zxyTileImage.png?z={z}&x={x}&y={y}';
-      // var map = new mapboxgl.Map({
-      //   container: 'map',
-      //   style: {
-      //     version: 8,
-      //     sources: {
-      //       'raster-tiles': {
-      //         attribution: attribution,
-      //         type: 'raster',
-      //         tiles: [tileURL],
-      //         tileSize: 256
-      //       }
-      //     },
-      //     layers: [
-      //       {
-      //         id: 'simple-tiles',
-      //         type: 'raster',
-      //         source: 'raster-tiles',
-      //         minzoom: 0,
-      //         maxzoom: 22
-      //       }
-      //     ]
-      //   },
-      //   pitch: 35.210526315789465,
-      //   center: [104.288144, 31.239692],
-      //   zoom: 4.4,
-      //   antialias: true
-      // });
       mapboxgl.supermap
         .initMap(host + '/iserver/services/map-mvt-landuse/rest/maps/landuse', {
           type: 'vector-tile',
           mapOptions: {
-            zoom: 12,
-            pitch: 60
+            zoom: 1,
+            pitch: 90
           }
         })
         .then(function (result) {
@@ -174,29 +149,15 @@
             }
           };
           
-          map.on('load', () => {
+          // map.on('load', () => {
             console.log('load');
             window.map = map;
             var layer = new mapboxgl.supermap.L7Layer({ type: 'PointLayer' });
             var l7Layer = layer.getL7Layer();
             data.forEach((item) => {
               const { j: lng, w: lat } = item;
-              const coor = transformToMultiCoor(lng, lat, map);
-              // item.j = coor[0];
-              // item.w = coor[1];
               new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
-              console.log(coor, [lng, lat]);
             });
-
-            function transformToMultiCoor(lng, lat, map) {
-              const coor = map.getCRS().fromWGS84([lng, lat]);
-              const extent = map.getCRS().getExtent();
-              const width = extent[2] - extent[0];
-              const height = extent[3] - extent[1];
-              const xScale = ((coor[0] - extent[0]) / width) * 512 + 0;
-              const yScale = ((extent[3] - coor[1]) / height) * 512 - 128;
-              return [xScale, yScale];
-            }
             l7Layer
               .source(data, {
                 parser: {
@@ -213,25 +174,20 @@
             var l7Layer3 = polygonlayer.getL7Layer();
             l7Layer3.source(source2.data).color('red').shape('fill');
 
-
-            map.addLayer(layer);
-            // map.addLayer(polygonlayer);
-
+            // map.addLayer(layer);
+            console.log('----------======----')
             map.getL7Scene().then(scene=>{
-              scene.on('click', (ev) => {
-                console.log(ev)
-              });
+              console.log('--------------')
               createButtons(data, source, source2, scene)
-
             })
             l7Layer.on('click', (e) => {
               console.log('layer: ',e)
             });
             
-          });
+          // });
          
       });
-      function createButtons(data, source, source2, scene) {
+      function createButtons(data, source, source2,scene) {
         const btns = {
             creatIconPoint:()=>creatIconPoint(data, map),
             creaWallLine:()=>creaWallLine(source.data, map),
@@ -254,7 +210,9 @@
             createOcean: ()=>createOcean(data, map),
             createWater: ()=>createWater(data, map),
             createCityBuildings: ()=>createCityBuildings(data, map),
-            createOD: () => createOD(map, scene),
+            creatRain: ()=>creatRain(data, map),
+            addChart: () => addChart(scene,map),
+
           }
         
 
@@ -268,111 +226,90 @@
           })
          
         }
+       
+        function addChart(scene, map) {
+  fetch(
+    'https://gw.alipayobjects.com/os/basement_prod/0b96cca4-7e83-449a-93d0-2a77053e74ab.json',
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      data.nodes.forEach(function (item) {
+        const el = document.createElement('div');
+        const total =
+          item.gdp.Agriculture + item.gdp.Industry + item.gdp.Service;
+        const coordinates = item.coordinates;
+        new mapboxgl.Marker().setLngLat(coordinates).addTo(map);
 
-        // OD图
-function createOD(map, scene) {
-  scene.addImage(
-    'plane',
-    'https://gw.alipayobjects.com/zos/bmw-prod/0ca1668e-38c2-4010-8568-b57cb33839b9.svg',
-  );
-  Promise.all([
-    fetch(
-      'https://gw.alipayobjects.com/os/bmw-prod/2960e1fc-b543-480f-a65e-d14c229dd777.json',
-    ).then((d) => d.json()),
-    fetch(
-      'https://gw.alipayobjects.com/os/basement_prod/4472780b-fea1-4fc2-9e4b-3ca716933dc7.json',
-    ).then((d) => d.text()),
-    fetch(
-      'https://gw.alipayobjects.com/os/basement_prod/a5ac7bce-181b-40d1-8a16-271356264ad8.json',
-    ).then((d) => d.text()),
-  ]).then(function onLoad([world, dot, flyline]) {
-    const dotData = eval(dot);
-    // @ts-ignore
-    const flydata = eval(flyline).map((item) => {
-      // @ts-ignore
-      const latlng1 = item.from.split(',').map((e) => {
-        return e * 1;
-      });
-      // @ts-ignore
-      const latlng2 = item.to.split(',').map((e) => {
-        return e * 1;
-      });
-      return { coord: [latlng1, latlng2] };
-    });
+        const size = Math.min(parseInt(total / 30000, 10), 70);
+        if (size < 30) {
+          return;
+        }
+        const itemData = [
+          {
+            item: 'Agriculture',
+            count: item.gdp.Agriculture,
+            percent: item.gdp.Agriculture / total,
+          },
+          {
+            item: 'Industry',
+            count: item.gdp.Industry,
+            percent: item.gdp.Industry / total,
+          },
+          {
+            item: 'Service',
+            count: item.gdp.Service,
+            percent: item.gdp.Service / total,
+          },
+        ];
 
-    var worldLine = new mapboxgl.supermap.L7Layer({ type: 'LineLayer' });
-    var l7Layer = worldLine.getL7Layer();
-    l7Layer.source(world).color('#41fc9d').size(0.5).style({
-      opacity: 0.4,
-    });
-
-    var dotPoint = new mapboxgl.supermap.L7Layer({ type: 'PointLayer' });
-    dotPoint
-      .getL7Layer()
-      .source(dotData, {
-        parser: {
-          type: 'json',
-          x: 'lng',
-          y: 'lat',
-        },
-      })
-      .shape('circle')
-      .color('#ffed11')
-      .animate(true)
-      .size(40);
-
-    var flyLine = new mapboxgl.supermap.L7Layer({
-          type: 'LineLayer',
-          options: { blend: 'normal' },
+        const chart = new G2.Chart({
+          container: el,
+          width: size,
+          height: size,
+          render: 'svg',
+          padding: 0,
         });
-        flyLine
-          .getL7Layer()
-          .source(flydata, {
-            parser: {
-              type: 'json',
-              coordinates: 'coord',
-            },
-          })
-          .color('#ff6b34')
-          .texture('plane')
-          .shape('arc')
-          .size(15)
-          .animate({
-            duration: 1,
-            interval: 0.2,
-            trailLength: 0.05,
-          })
-          .style({
-            textureBlend: 'replace',
-            lineTexture: true, // 开启线的贴图功能
-            iconStep: 10, // 设置贴图纹理的间距
-          });
-        var flyLine2 = new mapboxgl.supermap.L7Layer({
-          type: 'LineLayer',
-          options: { blend: 'normal' },
+        chart.legend(false);
+        chart.data(itemData);
+        chart.tooltip(false);
+
+        chart.axis('count', false);
+        chart.axis('item', false);
+        chart
+          .interval()
+          .position('item*count')
+          .color('item', ['#5CCEA1', '#5D7092', '#5B8FF9']);
+        chart.render();
+        const marker = new L7.Marker({
+          element: el,
+        }).setLnglat({
+          lng: item.coordinates[0],
+          lat: item.coordinates[1],
         });
-        flyLine2
-          .getL7Layer()
-          .source(flydata, {
-            parser: {
-              type: 'json',
-              coordinates: 'coord',
-            },
-          })
-          .color('#ff6b34')
-          .shape('arc')
-          .size(1)
-          .style({
-            lineType: 'dash',
-            dashArray: [5, 5],
-            opacity: 0.5,
-          });
-        map.addLayer(worldLine);
-        map.addLayer(dotPoint);
-        map.addLayer(flyLine2);
-        map.addLayer(flyLine);
+        scene.addMarker(marker);
       });
-    }
+    });
+}
+
+       
+         function creatRain(data, map) {
+          var layer = new mapboxgl.supermap.L7Layer({ type: 'GeometryLayer' });
+          var l7Layer = layer.getL7Layer();
+          l7Layer
+            .shape('sprite')
+            .size(10)
+            .style({
+              // opacity: 0.5,
+              mapTexture: './js/A_w2SFSZJp4nIAAAAAAAAAAAAAARQnAQ.png', // rain
+              center: [108.91314171858397, 23.826244669161124],
+              spriteCount: 6000,
+              spriteRadius: 100,
+              spriteTop: 2500000,
+              spriteUpdate: 20000,
+              // spriteScale: 0.6,
+            });
+          map.addLayer(layer);
+        }
         function createCityBuildings(data, map) {
           fetch(
             'https://gw.alipayobjects.com/os/basement_prod/972566c5-a2b9-4a7e-8da1-bae9d0eb0117.json'
@@ -963,6 +900,35 @@ function createOD(map, scene) {
           ]
         })
         .shape('square')
+        .style({
+          coverage: 1,
+          angle: 0
+        })
+        .color('red');
+        map.addLayer(layer);
+     }
+  
+
+     function creategrid(data, map) {
+        var layer = new mapboxgl.supermap.L7Layer({ type: 'HeatmapLayer' });
+        var l7Layer = layer.getL7Layer();
+          l7Layer
+          .source(data, {
+          parser: {
+            type: 'json',
+            x: 'j',
+            y: 'w'
+          },
+          transforms: [
+            {
+              type: 'hexagon',
+              size: 200,
+              field: 'v',
+              method: 'sum'
+            }
+          ]
+        })
+        .shape('hexagon')
         .style({
           coverage: 1,
           angle: 0
