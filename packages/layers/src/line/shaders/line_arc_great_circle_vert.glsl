@@ -7,6 +7,8 @@ attribute vec4 a_Color;
 attribute vec3 a_Position;
 attribute vec4 a_Instance;
 attribute float a_Size;
+attribute vec4 a_Position1;
+
 uniform mat4 u_ModelMatrix;
 uniform mat4 u_Mvp;
 uniform float segmentNumber;
@@ -149,16 +151,12 @@ void main() {
 
   float nextSegmentRatio = getSegmentRatio(segmentIndex + indexDir);
   v_distance_ratio = segmentIndex / segmentNumber;
-  vec4 curr = project_position(vec4(degrees(interpolate(source, target, angularDist, segmentRatio)), 0.0, 1.0));
-  vec4 next = project_position(vec4(degrees(interpolate(source, target, angularDist, nextSegmentRatio)), 0.0, 1.0));
-  // v_normal = getNormal((next.xy - curr.xy) * indexDir, a_Position.y);
+  vec4 curr = project_position(vec4(a_Position1[0], a_Position1[1],0.0, 1.0));
+  vec4 next = project_position(vec4(a_Position1[2], a_Position1[3],0.0, 1.0));
   vec2 offset = project_pixel(getExtrusionOffset((next.xy - curr.xy) * indexDir, a_Position.y));
-  //  vec4 project_pos = project_position(vec4(curr.xy, 0, 1.0));
-  // gl_Position = project_common_position_to_clipspace(vec4(curr.xy + offset, curr.z, 1.0));
 
 v_line_data.g = a_Position.x; // 该顶点在弧线上的分段排序
   if(LineTexture == u_line_texture) { // 开启贴图模式  
-    // float mapZoomScale = u_CoordinateSystem !== COORDINATE_SYSTEM_P20_2?10000000.0:1.0;
     float d_arcDistrance = length(source - target);
     if(u_CoordinateSystem == COORDINATE_SYSTEM_P20) { // amap
       d_arcDistrance = d_arcDistrance * 1000000.0;

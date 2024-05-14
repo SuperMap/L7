@@ -14,6 +14,9 @@ import { ILineLayerStyleOptions } from '../../core/interface';
 import { LineArcTriangulation } from '../../core/triangulation';
 import line_arc_frag from '../shaders/line_arc_great_circle_frag.glsl';
 import line_arc2d_vert from '../shaders/line_arc_great_circle_vert.glsl';
+import { interpolate } from '../../../../utils/src/lineAtOffset/greatCircle';
+import { transformOffset } from '../../../../maps/src/mapbox/utils';
+
 const lineStyleObj: { [key: string]: number } = {
   solid: 0.0,
   dash: 1.0,
@@ -136,7 +139,47 @@ export default class GreatCircleModel extends BaseModel {
           featureIdx: number,
           vertex: number[],
         ) => {
-          return [vertex[3], vertex[4], vertex[5], vertex[6]];
+          const { originCoordinates } = feature;
+          if (originCoordinates&& this.mapService.version==='MAPBOX') {
+            const [source, target]= originCoordinates;
+            return [source[0], source[1], target[0], target[1]];
+          } else {
+            return [vertex[3], vertex[4], vertex[5], vertex[6]];
+          }
+        },
+      },
+    });
+
+    this.styleAttributeService.registerStyleAttribute({
+      name: 'Position1',
+      type: AttributeType.Attribute,
+      descriptor: {
+        name: 'a_Position1',
+        buffer: {
+          usage: gl.STATIC_DRAW,
+          data: [],
+          type: gl.FLOAT,
+        },
+        size: 4,
+        update: (
+          feature: IEncodeFeature,
+          featureIdx: number,
+          vertex: number[],
+        ) => {
+          const {coordinates, originCoordinates} = feature;
+          const [source, target] = originCoordinates || coordinates;
+          const a_Instance = [source[0], source[1], target[0], target[1]];
+          const { segmentNumber } = this.getUninforms();
+          const  a_Position = vertex.length === 2
+          ? [vertex[0], vertex[1], 0]
+          : [vertex[0], vertex[1], vertex[2]];
+          const {currentDegree, nextDegree} = this.handleGLSL(a_Instance, a_Position, segmentNumber);
+          if (originCoordinates && this.mapService.version==='MAPBOX') {
+            const res =  this.transformMapboxOffset(currentDegree, nextDegree);
+            return res;
+          } else {
+            return [...currentDegree, ...nextDegree]
+          }
         },
       },
     });
@@ -162,6 +205,32 @@ export default class GreatCircleModel extends BaseModel {
         },
       },
     });
+  }
+  
+  handleGLSL(a_Instance:number[], a_Position:number[], segmentNumber: any) {
+    const getSegmentRatio = (index: number) => {
+      return index / (segmentNumber - 1);
+    }
+    const mix =(x:number, y:number, a:number) => x*(1-a) + y*a
+    const step =(a:number, x:number) => x < a ? 0 : 1
+    
+    const source =[a_Instance[0], a_Instance[1]];
+    const target = [a_Instance[2],a_Instance[3]];
+
+    const segmentIndex = a_Position[0];
+    const segmentRatio = getSegmentRatio(segmentIndex);
+    const indexDir = mix(-1.0, 1.0, step(segmentIndex, 0.0));
+
+    const nextSegmentRatio = getSegmentRatio(segmentIndex + indexDir);
+    const currentDegree = interpolate(source, target, segmentRatio, this.mapService.version);
+    const nextDegree = interpolate(source, target, nextSegmentRatio, this.mapService.version)
+    return {currentDegree, nextDegree};
+  }
+
+  transformMapboxOffset(currentDegree:number[], nextDegree:number[]) {
+    const curr = transformOffset(currentDegree, this.mapService.map, 512);
+    const next = transformOffset(nextDegree, this.mapService.map, 512);
+    return [...curr, ...next]
   }
 
   private updateTexture = () => {
