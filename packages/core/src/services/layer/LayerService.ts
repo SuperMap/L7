@@ -129,8 +129,9 @@ export default class LayerService
   }
 
   public removeAllLayers(): void {
-    // this.destroy();
-    // this.reRender();
+    this.destroy();
+    this.stopAllRender();
+    this.layerList = [];
   }
 
   public setEnableRender(flag: boolean) {
@@ -356,5 +357,13 @@ export default class LayerService
 
   private stopRender(id: any) {
     $window.cancelAnimationFrame(this.layerRenderID[id]);
+    delete this.layerRenderID[id];
+  }
+
+  private stopAllRender() {
+    for(const id in this.layerRenderID) {
+      $window.cancelAnimationFrame(this.layerRenderID[id]);
+    }
+    this.layerRenderID = {};
   }
 }
