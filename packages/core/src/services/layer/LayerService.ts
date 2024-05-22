@@ -163,7 +163,15 @@ export default class LayerService
     // this.debugService.renderEnd(renderUid);
     // this.alreadyInRendering = false;
   }
-
+  public async renderAllLayers() {
+    if (!this.enableRender) {
+      return;
+    }
+    this.updateLayerRenderList();
+    for (const layer of this.layerList) {
+      this.renderLayer(layer.id)
+    }
+  }
   public async renderLayer(id: string) {
     if (!this.enableRender) {
       return;
@@ -309,12 +317,10 @@ export default class LayerService
       this.stopAllAnimate();
       return;
     }
-    if (--this.animateInstanceCount[id] === 0) {
       this.stopRender(id);
       this.clock.stop();
-      delete this.animateInstanceCount[id];
+      this.animateInstanceCount = {};
     }
-  }
 
   public getOESTextureFloat() {
     return this.renderService.extensionObject.OES_texture_float;
@@ -349,7 +355,7 @@ export default class LayerService
   }
 
   private runRender(id: any) {
-    this.renderLayer(id);
+    this.renderAllLayers();
     this.layerRenderID[id] = $window.requestAnimationFrame(() => {
       this.runRender(id);
     });
