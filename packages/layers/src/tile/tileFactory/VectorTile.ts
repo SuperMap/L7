@@ -29,7 +29,7 @@ export default class VectorTile extends Tile {
     await this.addLayer(layer);
     if (layerOptions.tileMask) {
       // 瓦片数据裁剪
-      await this.addTileMask();
+      // await this.addTileMask();
     }
     this.setLayerMinMaxZoom(layer);
     this.isLoaded = true;
