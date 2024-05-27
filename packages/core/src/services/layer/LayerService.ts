@@ -35,7 +35,7 @@ export default class LayerService
 
   private sceneInited: boolean = false;
 
-  private animateInstanceCount: object = {};
+  private animateInstanceCount = 0;
 
   // TODO: 是否开启 shader 中的颜色拾取计算
   private shaderPicking: boolean = true;
@@ -297,30 +297,19 @@ export default class LayerService
     this.emit('layerChange', this.layers);
   }
 
-  public startAnimate(id: any) {
-    this.animateInstanceCount[id] = this.animateInstanceCount[id] || 0
-    if (this.animateInstanceCount[id]++ === 0) {
+  public startAnimate() {
+    if (this.animateInstanceCount++ === 0) {
       this.clock.start();
-      this.runRender(id);
+      this.runRender();
     }
-  }
-  private stopAllAnimate() {
-    this.layerList.forEach(item => {
-      this.stopRender(item.id);
-    })
-    this.clock.stop();
-    this.animateInstanceCount= {};
   }
 
-  public stopAnimate(id: any) {
-    if (!id) {
-      this.stopAllAnimate();
-      return;
-    }
-      this.stopRender(id);
+  public stopAnimate() {
+    if (--this.animateInstanceCount === 0) {
+      this.stopRender();
       this.clock.stop();
-      this.animateInstanceCount = {};
     }
+  }
 
   public getOESTextureFloat() {
     return this.renderService.extensionObject.OES_texture_float;
@@ -354,22 +343,19 @@ export default class LayerService
     });
   }
 
-  private runRender(id: any) {
+  private runRender() {
     this.renderAllLayers();
-    this.layerRenderID[id] = $window.requestAnimationFrame(() => {
-      this.runRender(id);
+    this.layerRenderID = $window.requestAnimationFrame(() => {
+      this.runRender();
     });
   }
 
-  private stopRender(id: any) {
-    $window.cancelAnimationFrame(this.layerRenderID[id]);
-    delete this.layerRenderID[id];
+  private stopRender() {
+    $window.cancelAnimationFrame(this.layerRenderID);
   }
 
   private stopAllRender() {
-    for(const id in this.layerRenderID) {
-      $window.cancelAnimationFrame(this.layerRenderID[id]);
-    }
-    this.layerRenderID = {};
+    this.stopRender();
+    this.animateInstanceCount = 0;
   }
 }
