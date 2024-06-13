@@ -371,6 +371,7 @@ export class TilesetManager extends EventEmitter {
       z,
       tileSize: this.options.tileSize,
       warp: this.options.warp,
+      map: this.map
     });
 
     this.cacheTiles.set(tileId, tile);

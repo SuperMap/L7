@@ -1,6 +1,6 @@
 import { DEFAULT_EXTENT } from '../const';
 import { TileBounds } from '../types';
-import { getTileXY } from '../.../../../../../maps/src/mapbox/utils'
+import { getTileXY, getTileBounds } from '../.../../../../../maps/src/mapbox/utils'
 
 // // https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#ECMAScript_.28JavaScript.2FActionScript.2C_etc..29
 export function osmLonLat2TileXY(lon: number, lat: number, zoom: number) {
@@ -28,9 +28,10 @@ export function osmTileXY2LonLat(x: number, y: number, zoom: number) {
 /**
  * 获取当前瓦片的经纬度边界
  */
-export const tileToBounds = (x: number, y: number, z: number) => {
-  const [minLng, maxLat] = osmTileXY2LonLat(x, y, z);
-  const [maxLng, minLat] = osmTileXY2LonLat(x + 1, y + 1, z);
+export const tileToBounds = (x: number, y: number, z: number, map) => {
+  if(!map) return [];
+  const [minLng, maxLat] = getTileBounds(x, y, z, map);
+  const [maxLng, minLat] = getTileBounds(x + 1, y + 1, z, map);
   return [minLng, minLat, maxLng, maxLat] as TileBounds;
 };
 

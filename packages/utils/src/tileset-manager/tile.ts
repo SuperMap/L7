@@ -51,12 +51,13 @@ export class SourceTile extends EventEmitter {
 
   constructor(options: TileOptions) {
     super();
-    const { x, y, z, tileSize, warp = true } = options;
+    const { x, y, z, tileSize, warp = true, map } = options;
     this.x = x;
     this.y = y;
     this.z = z;
     this.warp = warp || true;
     this.tileSize = tileSize;
+    this.map = map;
   }
 
   // 是否正在请求瓦片
@@ -94,7 +95,7 @@ export class SourceTile extends EventEmitter {
 
   // 瓦片的经纬度边界
   public get bounds() {
-    return tileToBounds(this.x, this.y, this.z);
+    return tileToBounds(this.x, this.y, this.z, this.map);
   }
 
   // 瓦片边界面

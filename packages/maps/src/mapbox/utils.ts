@@ -164,3 +164,18 @@ export function getTileXY(
   const tileY = (extent[3] - y) / ratio;
   return [Math.floor(tileX), Math.floor(tileY)];
 }
+
+export function getTileBounds(
+  x: number,
+  y: number,
+  z: number,
+  map: mapboxgl.Map,
+) {
+  // 当前级别一张瓦片代表的地理宽度
+  const ratio = getResolutionRatio(z, map);
+  const extent = getCRSExtent(map);
+  const wrapperLng = x * ratio + extent[0];
+  const wrapperLat = extent[3] - y * ratio;
+  const coor = toWGS84([wrapperLng, wrapperLat], map);
+  return coor;
+}

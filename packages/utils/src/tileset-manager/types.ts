@@ -19,6 +19,7 @@ export type TileOptions = {
   z: number;
   tileSize: number;
   warp?: boolean;
+  map?: any;
 };
 
 export type TileLoadParams = TileOptions & {
