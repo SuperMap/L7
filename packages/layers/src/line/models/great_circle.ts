@@ -94,12 +94,14 @@ export default class GreatCircleModel extends BaseModel {
   }
 
   public async buildModels(): Promise<IModel[]> {
+    const { segmentNumber } = this.getUninforms();
     const model = await this.layer.buildLayerModel({
       moduleName: 'lineGreatCircle',
       vertexShader: line_arc2d_vert,
       fragmentShader: line_arc_frag,
       triangulation: LineArcTriangulation,
       depth: { enable: false },
+      segmentNumber
     });
     return [model];
   }
@@ -175,7 +177,7 @@ export default class GreatCircleModel extends BaseModel {
           : [vertex[0], vertex[1], vertex[2]];
           const {currentDegree, nextDegree} = this.handleGLSL(a_Instance, a_Position, segmentNumber);
           if (originCoordinates && this.mapService.version==='MAPBOX') {
-            const res =  this.transformMapboxOffset(currentDegree, nextDegree);
+            const res = this.transformMapboxOffset(currentDegree, nextDegree);
             return res;
           } else {
             return [...currentDegree, ...nextDegree]
@@ -220,7 +222,6 @@ export default class GreatCircleModel extends BaseModel {
     const segmentIndex = a_Position[0];
     const segmentRatio = getSegmentRatio(segmentIndex);
     const indexDir = mix(-1.0, 1.0, step(segmentIndex, 0.0));
-
     const nextSegmentRatio = getSegmentRatio(segmentIndex + indexDir);
     const currentDegree = interpolate(source, target, segmentRatio, this.mapService.version);
     const nextDegree = interpolate(source, target, nextSegmentRatio, this.mapService.version)
