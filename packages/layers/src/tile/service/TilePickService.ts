@@ -10,6 +10,7 @@ import {
 import { decodePickingColor, encodePickingColor } from '@antv/l7-utils';
 import { TileLayerService } from './TileLayerService';
 import { TileSourceService } from './TileSourceService';
+
 export interface ITilePickServiceOptions {
   layerService: ILayerService;
   tileLayerService: TileLayerService;
@@ -42,6 +43,18 @@ export class TilePickService implements ITilePickService {
       const pickLayer = tile.getMainLayer();
       pickLayer?.layerPickService.pickRender(target);
     }
+  }
+  public pickBoxSelectTiles(box:[number, number, number, number], map: any) {
+    const [x, y, x1, y1]= box;
+    const minLngLat = map.unproject({x, y});
+    const maxLngLat = map.unproject({x:x1, y:y1})
+    console.log(minLngLat, maxLngLat)
+    const tiles = this.tileLayerService.getVisibleTileByBox(minLngLat, maxLngLat);
+    tiles.forEach(tile=>{
+      // TODO 多图层拾取
+      const pickLayer = tile.getMainLayer();
+      pickLayer?.layerPickService.pickRender(minLngLat);
+    })
   }
 
   public pick(layer: ILayer, target: IInteractionTarget) {

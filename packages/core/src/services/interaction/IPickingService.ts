@@ -39,6 +39,7 @@ export interface ILayerPickService {
    * @param target 触发对象
    */
   pickRender(target: IInteractionTarget): void;
+  pickBoxSelectTiles(box: [number, number, number, number], map:any): void;
   /**
    * 为图层设置选中对象
    * @param pickedColors

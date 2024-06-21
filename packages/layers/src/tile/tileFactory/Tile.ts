@@ -42,6 +42,18 @@ export default abstract class Tile implements ITile {
     return lng >= minLng && lng <= maxLng && lat >= minLat && lat <= maxLat;
   }
 
+  public boxInBounds(minLnglat: ILngLat, maxLngLat: ILngLat): boolean {
+    const [ leftLng, leftLat, rightLng, rightLat] = this.sourceTile.bounds;
+    const { lng: minLng, lat: minLat } = minLnglat;
+    const { lng: maxLng, lat: maxLat } = maxLngLat;
+    const inner = leftLng >= minLng && rightLng <= maxLng && leftLat >= minLat && rightLat <= maxLat;
+    const left = leftLng <= minLng && rightLng >= minLng;
+    const right = leftLng <= maxLng && rightLng >= maxLng;
+    const top = leftLat <= minLat && rightLat >= minLat;
+    const bottom = leftLat <= maxLat && rightLat >= maxLat;
+    return inner || left || right || top || bottom;
+  }
+
   protected getLayerOptions() {
     const options = this.parent.getLayerConfig();
     return {

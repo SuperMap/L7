@@ -55,6 +55,13 @@ export class TileLayerService {
     );
   }
 
+  public getVisibleTileByBox(minLngLat: ILngLat, maxLngLat: ILngLat): ITile[] | [] {
+    // 加载完成 & 可见 & 鼠标选中    
+    return this.layerTiles.filter(
+      (tile) => tile.isLoaded && tile.visible && tile.boxInBounds(minLngLat, maxLngLat),
+    );
+  }
+
   public removeTile(tileKey: string) {
     const index = this.layerTiles.findIndex((t) => t.key === tileKey);
     const tile = this.layerTiles.splice(index, 1);
