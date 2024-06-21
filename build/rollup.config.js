@@ -11,6 +11,7 @@ import inlineWorker from './rollup-plugin-inline-worker';
 import postcss from 'rollup-plugin-postcss';
 import url from 'postcss-url';
 // const { visualizer } = require('rollup-plugin-visualizer');
+import banner from './banner';
 
 const { BUILD, MINIFY, TYPE } = process.env;
 const minified = MINIFY === 'true';
@@ -36,6 +37,7 @@ module.exports = [
         [`${TYPE}-gl`]: `${TYPE}gl`,
       },
       sourcemap: !production,
+      banner,
     },
     external: [`${TYPE}-gl`],
     treeshake: minified,
