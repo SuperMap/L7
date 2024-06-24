@@ -85,7 +85,16 @@ export default class PickingService implements IPickingService {
         stencil: 0,
         depth: 1,
       });
-      layer.layerPickService.pickBoxSelectTiles(box, this.mapService.map);
+      if (typeof layer.layerPickService.pickBoxSelectTiles === 'function') {
+        // 处理mvt点击
+        layer.layerPickService.pickBoxSelectTiles(box, this.mapService.map);
+      } else {
+        layer.hooks.beforePickingEncode.call();
+        layer.renderModels({
+          ispick: true,
+        });
+        layer.hooks.afterPickingEncode.call();
+      }
       const features = this.pickBox(layer, box);
       cb(features);
     });
