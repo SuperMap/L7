@@ -134,17 +134,15 @@ export default class PickingService implements IPickingService {
 
     const features = [];
     const featuresIdMap: { [key: string]: boolean } = {};
+    const { featureId } = layer.getLayerConfig();
     for (let i = 0; i < pickedColors.length / 4; i = i + 1) {
       const color = pickedColors.slice(i * 4, i * 4 + 4);
       const pickedFeatureIdx = decodePickingColor(color);
       if (pickedFeatureIdx !== -1 && !featuresIdMap[pickedFeatureIdx]) {
-        const rawFeature =
-          layer.layerPickService.getFeatureById(pickedFeatureIdx);
-        features.push({
-          // @ts-ignore
-          ...rawFeature,
-          pickedFeatureIdx,
-        });
+        let rawFeature =
+          layer.layerPickService.getFeatureById(pickedFeatureIdx, featureId);
+        rawFeature = rawFeature instanceof Array ? rawFeature : [rawFeature];
+        features.push(...rawFeature);
         featuresIdMap[pickedFeatureIdx] = true;
       }
     }

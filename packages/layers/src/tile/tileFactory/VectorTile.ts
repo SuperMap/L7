@@ -1,5 +1,6 @@
 import { ILayer, ILayerAttributesOption } from '@antv/l7-core';
 import { VectorSource } from '@antv/l7-source';
+import { cloneDeep } from 'lodash';
 import Tile from './Tile';
 import { getTileLayer } from './util';
 
@@ -79,12 +80,29 @@ export default class VectorTile extends Tile {
    * @param id
    * @returns
    */
-  public getFeatureById(id: number) {
+  public getFeatureById(_id: number, featureId = 'id') {
     const layer = this.getMainLayer();
     if (!layer) {
       return [];
     }
-    const res = layer.getSource().data.dataArray.filter((d) => d._id === id);
+    const source = layer.getSource();
+    const res = cloneDeep(source.data.dataArray.filter((d) => d._id === _id));
+    if (res.length === 0) {
+      return res;
+    }
+    if (source.parser.type === 'geojson') {
+      const data = res.map((item) => {
+        const id = item[featureId];
+        const feature = source.originData.features.find(
+          (item) => item[featureId] === id || item.properties[featureId] === id,
+        );
+        const newFeature = cloneDeep(feature);
+        delete item.coordinates;
+        newFeature.properties = item;
+        return newFeature;
+      });
+      return data;
+    }
     return res;
   }
 }

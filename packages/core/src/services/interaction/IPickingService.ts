@@ -56,5 +56,5 @@ export interface ILayerPickService {
    * 获取选中的要素
    * @param id q
    */
-  getFeatureById(id: number, lngLat?: ILngLat): any;
+  getFeatureById(id: number, lngLat?: ILngLat, featureId): any;
 }

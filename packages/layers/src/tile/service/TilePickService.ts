@@ -48,7 +48,6 @@ export class TilePickService implements ITilePickService {
     const [x, y, x1, y1]= box;
     const minLngLat = map.unproject({x, y});
     const maxLngLat = map.unproject({x:x1, y:y1})
-    console.log(minLngLat, maxLngLat)
     const tiles = this.tileLayerService.getVisibleTileByBox(minLngLat, maxLngLat);
     tiles.forEach(tile=>{
       // TODO 多图层拾取
@@ -134,7 +133,7 @@ export class TilePickService implements ITilePickService {
   }
 
   /** 从瓦片中根据数据 */
-  public getFeatureById(pickedFeatureIdx: number) {
+  public getFeatureById(pickedFeatureIdx: number, featureId?: string) {
     // 提取当前可见瓦片
     const tiles = this.tileLayerService
       .getTiles()
@@ -142,7 +141,7 @@ export class TilePickService implements ITilePickService {
     // 提取当前可见瓦片中匹配 ID 的 feature 列表
     const features: any[] = [];
     tiles.forEach((tile: ITile) => {
-      features.push(...tile.getFeatureById(pickedFeatureIdx));
+      features.push(...tile.getFeatureById(pickedFeatureIdx, featureId));
     });
 
     // 将 feature 列表合并后返回
