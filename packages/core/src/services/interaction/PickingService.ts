@@ -15,6 +15,8 @@ import { gl } from '../renderer/gl';
 import { IFramebuffer } from '../renderer/IFramebuffer';
 import { IRendererService } from '../renderer/IRendererService';
 import { IPickingService } from './IPickingService';
+import { cloneDeep } from 'lodash';
+
 @injectable()
 export default class PickingService implements IPickingService {
   public pickedColors: Uint8Array | undefined;
@@ -139,14 +141,39 @@ export default class PickingService implements IPickingService {
       const color = pickedColors.slice(i * 4, i * 4 + 4);
       const pickedFeatureIdx = decodePickingColor(color);
       if (pickedFeatureIdx !== -1 && !featuresIdMap[pickedFeatureIdx]) {
-        let rawFeature =
-          layer.layerPickService.getFeatureById(pickedFeatureIdx, featureId);
-        rawFeature = rawFeature instanceof Array ? rawFeature : [rawFeature];
+        let rawFeature = layer.layerPickService.getFeatureById(
+          pickedFeatureIdx,
+          featureId,
+        );
+        rawFeature = this.handleRawFeature(rawFeature);
         features.push(...rawFeature);
         featuresIdMap[pickedFeatureIdx] = true;
       }
     }
     return features;
+  }
+  handleRawFeature(rawFeature: any) {
+    rawFeature = rawFeature instanceof Array ? rawFeature : [rawFeature];
+    const res = rawFeature.map((item) => {
+      if (item === 'null') {
+        return item;
+      }
+      if (item.type === 'Feature') {
+        return item;
+      }
+      const newFeature = {
+        properties: {},
+        geometry: { type: '', coordinates: [] },
+      };
+      const coordinates = cloneDeep(item.coordinates);
+      delete item.coordinates;
+      newFeature.properties = item;
+      if (coordinates) {
+        newFeature.geometry = { type: '', coordinates };
+      }
+      return newFeature;
+    });
+    return res;
   }
 
   // 动态设置鼠标光标
@@ -221,8 +248,10 @@ export default class PickingService implements IPickingService {
     ) {
       const pickedFeatureIdx = decodePickingColor(pickedColors);
       // 瓦片数据获取性能问题需要优化
-      const rawFeature =
+      let rawFeature =
         layer.layerPickService.getFeatureById(pickedFeatureIdx);
+      const rawFeature1 = this.handleRawFeature(rawFeature);
+      rawFeature = rawFeature1[0]
       if (
         pickedFeatureIdx !== layer.getCurrentPickId() &&
         type === 'mousemove'
