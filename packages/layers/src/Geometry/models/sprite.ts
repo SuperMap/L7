@@ -67,7 +67,7 @@ export default class SpriteModel extends BaseModel {
   }
 
   public planeGeometryUpdateTriangulation = () => {
-    const { spriteBottom = -100000 } =
+    const { spriteBottom = -10 } =
       this.layer.getLayerConfig() as IGeometryLayerStyleOptions;
     const updateZ = this.spriteUpdate;
     const bottomZ = spriteBottom;
