@@ -205,10 +205,22 @@ export default class DataMappingPlugin implements ILayerPlugin {
     this.adjustData2SimpleCoordinates(mappedData);
     if (
       this.coordinateSystemService.getCoordinateSystem() ===
-      CoordinateSystem.LNGLAT || this.coordinateSystemService.getCoordinateSystem() ===
+      CoordinateSystem.LNGLAT
+    ) {
+      this.adjustData2MapboxCoordinates(mappedData);
+    } else if (
+      this.coordinateSystemService.getCoordinateSystem() ===
       CoordinateSystem.METER_OFFSET
     ) {
-this.adjustData2MapboxCoordinates(mappedData);
+      const map = this.mapService.map as Map;
+      const { lng, lat } = map.getCenter();
+      const center = transformOffset([lng, lat], map, 512);
+      this.coordinateSystemService.offsetCenter = [lng, lat];
+      this.coordinateSystemService.offsetCenterTransform = [
+        center[0],
+        center[1],
+      ];
+      this.adjustData2MapboxCoordinates(mappedData);
     }
     return mappedData;
   }
@@ -223,13 +235,12 @@ this.adjustData2MapboxCoordinates(mappedData);
     ) {
       mappedData.map((d) => {
         d.version = Version['MAPBOX'];
-        if(!d.originCoordinates){
- // @ts-ignore
- d.originCoordinates = cloneDeep(d.coordinates);
- // @ts-ignore
- d.coordinates = this.getMapboxCoordiantes(d.coordinates);
+        if (!d.originCoordinates) {
+          // @ts-ignore
+          d.originCoordinates = cloneDeep(d.coordinates);
+          // @ts-ignore
+          d.coordinates = this.getMapboxCoordiantes(d.coordinates);
         }
-       
       });
     }
   }
@@ -267,12 +278,20 @@ this.adjustData2MapboxCoordinates(mappedData);
     }
   }
   private project(coord: [number, number], map: Map, TILESIZE: number) {
-    // if (map.getZoom() <= 12 && this.getIsMultiCoor()) {
+    if (
+      this.coordinateSystemService.getCoordinateSystem() ===
+      CoordinateSystem.METER_OFFSET
+    ) {
+      const p = transformOffset(
+        coord,
+        map,
+        TILESIZE,
+        this.coordinateSystemService.offsetCenter,
+      );
+      return [Math.fround(p[0]), Math.fround(p[1])];
+    } else {
       return transformOffset(coord, map, TILESIZE);
-    // } else {
-    //   const { lng, lat } = map.getCenter();
-    //   return transformOffset(coord, map, undefined, [lng, lat]);
-    // }
+    }
   }
 
   private getIsMultiCoor() {

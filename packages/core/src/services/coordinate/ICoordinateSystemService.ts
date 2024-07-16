@@ -33,6 +33,8 @@ export const CoordinateUniform = {
 };
 
 export interface ICoordinateSystemService {
+  offsetCenterTransform: [number, number];
+  offsetCenter: [number, number];
   needRefresh: boolean;
   refresh(offset?: [number, number], lngLatExtent?: Array<number>): void;
   getCoordinateSystem(): CoordinateSystem;

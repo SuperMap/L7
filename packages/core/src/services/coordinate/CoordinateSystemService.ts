@@ -58,11 +58,15 @@ export default class CoordinateSystemService
    */
   private pixelsPerMeter: [number, number, number];
 
+  public offsetCenterTransform: [number, number];
+
+  public offsetCenter: [number, number];
+
   /**
    * 重新计算当前坐标系参数
    * TODO: 使用 memoize 缓存参数以及计算结果
    */
-  public refresh(offsetCenter: [number, number], lngLatExtent: Array<number>): void {
+  public refresh(offsetCenter: [number, number], lngLatExtent: number[]): void {
     // if (!this.needRefresh) {
     //   return;
     // }
@@ -75,7 +79,7 @@ export default class CoordinateSystemService
       latitude: center[1],
       zoom,
       lngLatExtent,
-      coordinateSystem: this.coordinateSystem
+      coordinateSystem: this.coordinateSystem,
     });
     this.viewportCenter = center;
     this.viewportCenterProjection = [0, 0, 0, 0];
@@ -89,7 +93,10 @@ export default class CoordinateSystemService
     ) {
       // 继续使用相机服务计算的 VP 矩阵
       this.cameraService.setViewProjectionMatrix(undefined);
-    } else if (this.coordinateSystem === CoordinateSystem.LNGLAT_OFFSET || this.coordinateSystem === CoordinateSystem.METER_OFFSET) {
+    } else if (
+      this.coordinateSystem === CoordinateSystem.LNGLAT_OFFSET ||
+      this.coordinateSystem === CoordinateSystem.METER_OFFSET
+    ) {
       this.calculateLnglatOffset(center, zoom, lngLatExtent);
     } else if (this.coordinateSystem === CoordinateSystem.P20_OFFSET) {
       this.calculateLnglatOffset(center, zoom, lngLatExtent, zoomScale, true);
@@ -108,10 +115,12 @@ export default class CoordinateSystemService
   }
 
   public getViewportCenter(map?: any): [number, number] {
-    // return transformOffset(this.viewportCenter, window.map, 512)
 
-    if (this.coordinateSystem === CoordinateSystem.METER_OFFSET) {
-      return transformOffset(
+    if (
+      this.coordinateSystem === CoordinateSystem.METER_OFFSET &&
+      this.offsetCenterTransform
+    ) {
+      const center = transformOffset(
         [
           Math.fround(this.viewportCenter[0]),
           Math.fround(this.viewportCenter[1]),
@@ -119,6 +128,19 @@ export default class CoordinateSystemService
         map,
         512,
       );
+      // if(!this.offsetCenterTransform){
+      //   const { lng, lat } = map.getCenter();
+      //   const center2= transformOffset([lng, lat], map, 512);
+      //   this.offsetCenter = [lng, lat];
+      //   this.offsetCenterTransform = [
+      //     center2[0],
+      //     center2[1],
+      //   ];
+      // }
+      return [
+        center[0] - this.offsetCenterTransform[0],
+        center[1] - this.offsetCenterTransform[1],
+      ];
     } else {
       return [this.viewportCenter[0], this.viewportCenter[1]];
     }
@@ -143,7 +165,7 @@ export default class CoordinateSystemService
   private calculateLnglatOffset(
     center: [number, number],
     zoom: number,
-    lngLatExtent: Array<number>,
+    lngLatExtent: number[],
     scale?: number,
     flipY?: boolean,
   ) {
@@ -160,7 +182,7 @@ export default class CoordinateSystemService
       scale,
       flipY,
       highPrecision: true,
-      coordinateSystem: this.coordinateSystem
+      coordinateSystem: this.coordinateSystem,
     });
 
     let viewMatrix = this.cameraService.getViewMatrix();
