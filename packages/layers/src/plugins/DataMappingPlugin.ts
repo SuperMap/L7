@@ -204,6 +204,13 @@ export default class DataMappingPlugin implements ILayerPlugin {
     // 调整数据兼容 SimpleCoordinates
     this.adjustData2SimpleCoordinates(mappedData);
     if (
+      this.coordinateSystemService.getCoordinateSystem() !==
+      CoordinateSystem.METER_OFFSET
+    ) {
+      this.coordinateSystemService.offsetCenter = null;
+      this.coordinateSystemService.offsetCenterTransform = null
+    }
+    if (
       this.coordinateSystemService.getCoordinateSystem() ===
       CoordinateSystem.LNGLAT
     ) {
@@ -215,11 +222,15 @@ export default class DataMappingPlugin implements ILayerPlugin {
       const map = this.mapService.map as Map;
       const { lng, lat } = map.getCenter();
       const center = transformOffset([lng, lat], map, 512);
-      this.coordinateSystemService.offsetCenter = [lng, lat];
-      this.coordinateSystemService.offsetCenterTransform = [
-        center[0],
-        center[1],
-      ];
+      if (!this.coordinateSystemService.offsetCenter) {
+        this.coordinateSystemService.offsetCenter = [lng, lat];
+      }
+      if (!this.coordinateSystemService.offsetCenterTransform) {
+        this.coordinateSystemService.offsetCenterTransform = [
+          center[0],
+          center[1],
+        ];
+      }
       this.adjustData2MapboxCoordinates(mappedData);
     }
     return mappedData;
