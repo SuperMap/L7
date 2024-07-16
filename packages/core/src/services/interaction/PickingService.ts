@@ -162,6 +162,7 @@ export default class PickingService implements IPickingService {
         return item;
       }
       const newFeature = {
+        type: 'Feature',
         properties: {},
         geometry: { type: '', coordinates: [] },
       };
