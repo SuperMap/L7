@@ -116,9 +116,9 @@ export default class MarkerLayer extends EventEmitter {
       }
     }
     this.markers.push(marker);
-    // if(this.inited) {
-    //   marker.addTo(this.scene);
-    // }
+    if (this.inited) {
+      marker.addTo(this.scene);
+    }
   }
 
   public removeMarker(marker: IMarker) {
