@@ -72,7 +72,7 @@ export default class InteractionService
   }
 
   private addEventListenerOnMap() {
-    const $containter = this.mapService.getMapContainer();
+    const $containter = (this.mapService.getMapCanvasContainer && this.mapService.getMapCanvasContainer()) || this.mapService.getMapContainer();
     if ($containter) {
       if (isMini) {
         $window.document.addEventListener(

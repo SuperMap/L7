@@ -84,7 +84,7 @@ export interface IMapService<RawMap = {}> {
   getRotation(): number;
   getBounds(): Bounds;
   getMapContainer(): HTMLElement | null;
-  getMapCanvasContainer(): HTMLElement;
+  getMapCanvasContainer(): HTMLElement | null;
   getMapStyleConfig(): MapStyleConfig; // 获取当前地图类型默认的样式配置
   getMapStyleValue(name: MapStyleName): string | any; // 获取当前地图类型key值对应的样式 value，可能为字符串，也可能为对象
   getMapStyle(): MapStyleName | any; // 获取当期地图

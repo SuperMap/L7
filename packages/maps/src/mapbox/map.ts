@@ -165,6 +165,13 @@ export default class MapboxService extends BaseMapService<
     return this.$mapContainer;
   }
 
+  public getMapCanvasContainer() {
+    if (this.$mapContainer) {
+      return this.$mapContainer.getElementsByClassName('mapboxgl-canvas-container')[0]
+    }
+    return this.$mapContainer;
+  }
+
   public meterToCoord(center: [number, number], outer: [number, number]) {
     // 统一根据经纬度来转化
     // Tip: 实际米距离 unit meter
