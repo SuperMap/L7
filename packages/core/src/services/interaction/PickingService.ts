@@ -167,8 +167,9 @@ export default class PickingService implements IPickingService {
         geometry: { type: '', coordinates: [] },
       };
       const coordinates = cloneDeep(item.coordinates);
-      delete item.coordinates;
-      newFeature.properties = item;
+      const itemCopy = cloneDeep(item);
+      delete itemCopy.coordinates;
+      newFeature.properties = itemCopy;
       if (coordinates) {
         newFeature.geometry = { type: '', coordinates };
       }
