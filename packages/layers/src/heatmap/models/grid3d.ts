@@ -6,13 +6,16 @@ import {
   IModel,
   IModelUniform,
 } from '@antv/l7-core';
+import { mat2, vec2 } from 'gl-matrix';
+import {
+  transformLnglat,
+  transformOffset,
+} from '../../../../maps/src/mapbox/utils';
 import BaseModel from '../../core/BaseModel';
 import { IHeatMapLayerStyleOptions } from '../../core/interface';
 import { PointExtrudeTriangulation } from '../../core/triangulation';
 import heatmapGrid3dVert from '../shaders/hexagon_3d_vert.glsl';
 import heatmapGridFrag from '../shaders/hexagon_frag.glsl';
-import { mat2, vec2 } from 'gl-matrix';
-import { transformLnglat, transformOffset } from '../../../../maps/src/mapbox/utils';
 export default class Grid3DModel extends BaseModel {
   public getUninforms(): IModelUniform {
     const { opacity, coverage, angle } =
@@ -39,10 +42,10 @@ export default class Grid3DModel extends BaseModel {
       fragmentShader: heatmapGridFrag,
       triangulation: PointExtrudeTriangulation,
       primitive: gl.TRIANGLES,
-      depth: { 
+      depth: {
         enable: true,
         // @ts-ignore
-        range: [0, 0.9]
+        range: [0, 0.9],
       },
     });
     return [model];
@@ -99,12 +102,13 @@ export default class Grid3DModel extends BaseModel {
           type: gl.FLOAT,
         },
         size: 3,
-        update: (feature: IEncodeFeature,featureIdx: number,vertice) => {
+        update: (feature: IEncodeFeature, featureIdx: number, vertice) => {
           let coordinates;
           if (feature.version === 'GAODE2.x') {
             coordinates = feature.originCoordinates;
           } else {
-            const { coverage = 1, angle } = this.layer.getLayerConfig() as IHeatMapLayerStyleOptions;
+            const { coverage = 1, angle } =
+              this.layer.getLayerConfig() as IHeatMapLayerStyleOptions;
             const { xOffset, yOffset } = this.layer.getSource().data;
             const rotationMatrix = mat2.create();
             mat2.rotate(rotationMatrix, rotationMatrix, angle);
@@ -114,12 +118,29 @@ export default class Grid3DModel extends BaseModel {
             vec2.multiply(offset, offset, vec2.fromValues(coverage, coverage));
             vec2.transformMat2(offset, offset, rotationMatrix);
             const lngLat = transformLnglat(
-              [feature.coordinates[0] + offset[0], feature.coordinates[1] + offset[1]],
+              [
+                feature.coordinates[0] + offset[0],
+                feature.coordinates[1] + offset[1],
+              ],
               this.mapService.map,
               256 << 20,
             );
-            if (this.mapService.coordinateSystemService.getCoordinateSystem() === CoordinateSystem.LNGLAT_OFFSET) {
+            if (
+              this.mapService.coordinateSystemService.getCoordinateSystem() ===
+              CoordinateSystem.LNGLAT_OFFSET
+            ) {
               coordinates = lngLat;
+            } else if (
+              this.mapService.coordinateSystemService.getCoordinateSystem() ===
+              CoordinateSystem.METER_OFFSET
+            ) {
+              coordinates = transformOffset(lngLat, this.mapService.map, 512);
+              const offsetCenterTransform =
+                this.mapService.coordinateSystemService.offsetCenterTransform;
+              coordinates = [
+                coordinates[0] - offsetCenterTransform[0],
+                coordinates[1] - offsetCenterTransform[1],
+              ];
             } else {
               coordinates = transformOffset(lngLat, this.mapService.map, 512);
             }

@@ -77,6 +77,17 @@ export default class HexagonModel extends BaseModel {
             );
             if (this.mapService.coordinateSystemService.getCoordinateSystem() === CoordinateSystem.LNGLAT_OFFSET) {
               coordinates = lngLat;
+            } else if (
+              this.mapService.coordinateSystemService.getCoordinateSystem() ===
+              CoordinateSystem.METER_OFFSET
+            ) {
+              coordinates = transformOffset(lngLat, this.mapService.map, 512);
+              const offsetCenterTransform =
+                this.mapService.coordinateSystemService.offsetCenterTransform;
+              coordinates = [
+                coordinates[0] - offsetCenterTransform[0],
+                coordinates[1] - offsetCenterTransform[1],
+              ];
             } else {
               coordinates = transformOffset(lngLat, this.mapService.map, 512);
             }

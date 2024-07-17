@@ -50,6 +50,7 @@ interface ISimpleMapCoord {
 }
 
 export interface IMapService<RawMap = {}> {
+  coordinateSystemService: any;
   version?: string;
   simpleMapCoord: ISimpleMapCoord;
   map: RawMap;

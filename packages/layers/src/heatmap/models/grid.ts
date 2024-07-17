@@ -60,7 +60,8 @@ export default class GridModel extends BaseModel {
           if (feature.version === 'GAODE2.x') {
             coordinates = feature.originCoordinates;
           } else {
-            const { coverage = 1, angle } = this.layer.getLayerConfig() as IHeatMapLayerStyleOptions;
+            const { coverage = 1, angle } =
+              this.layer.getLayerConfig() as IHeatMapLayerStyleOptions;
             const { xOffset, yOffset } = this.layer.getSource().data;
             const rotationMatrix = mat2.create();
             mat2.rotate(rotationMatrix, rotationMatrix, angle);
@@ -70,12 +71,29 @@ export default class GridModel extends BaseModel {
             vec2.multiply(offset, offset, vec2.fromValues(coverage, coverage));
             vec2.transformMat2(offset, offset, rotationMatrix);
             const lngLat = transformLnglat(
-              [feature.coordinates[0] + offset[0], feature.coordinates[1] + offset[1]],
+              [
+                feature.coordinates[0] + offset[0],
+                feature.coordinates[1] + offset[1],
+              ],
               this.mapService.map,
               256 << 20,
             );
-            if (this.mapService.coordinateSystemService.getCoordinateSystem() === CoordinateSystem.LNGLAT_OFFSET) {
+            if (
+              this.mapService.coordinateSystemService.getCoordinateSystem() ===
+              CoordinateSystem.LNGLAT_OFFSET
+            ) {
               coordinates = lngLat;
+            } else if (
+              this.mapService.coordinateSystemService.getCoordinateSystem() ===
+              CoordinateSystem.METER_OFFSET
+            ) {
+              coordinates = transformOffset(lngLat, this.mapService.map, 512);
+              const offsetCenterTransform =
+                this.mapService.coordinateSystemService.offsetCenterTransform;
+              coordinates = [
+                coordinates[0] - offsetCenterTransform[0],
+                coordinates[1] - offsetCenterTransform[1],
+              ];
             } else {
               coordinates = transformOffset(lngLat, this.mapService.map, 512);
             }
