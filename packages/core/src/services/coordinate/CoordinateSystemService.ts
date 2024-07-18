@@ -82,6 +82,7 @@ export default class CoordinateSystemService
       zoom,
       lngLatExtent,
       coordinateSystem: this.coordinateSystem,
+      epsgCode: this.epsgCode
     });
     this.viewportCenter = center;
     this.viewportCenterProjection = [0, 0, 0, 0];

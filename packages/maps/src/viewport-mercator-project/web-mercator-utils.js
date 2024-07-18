@@ -132,7 +132,8 @@ export function getDistanceScales({
   lngLatExtent,
   scale,
   highPrecision = false,
-  coordinateSystem
+  coordinateSystem,
+  epsgCode
 }) {
   // Calculate scale from zoom if not provided
   scale = scale !== undefined ? scale : zoomToScale(zoom);
@@ -157,7 +158,7 @@ export function getDistanceScales({
   const width = lngLatExtent[2] - lngLatExtent[0];
   const pixelsPerDegreeX = worldSize / width;
   let pixelsPerDegreeY = pixelsPerDegreeX;
-  if (coordinateSystem && coordinateSystem === CoordinateSystem.LNGLAT_OFFSET) {
+  if (coordinateSystem && coordinateSystem === CoordinateSystem.LNGLAT_OFFSET && epsgCode === 'EPSG:3857') {
     pixelsPerDegreeY = pixelsPerDegreeY / latCosine;
   }
 
