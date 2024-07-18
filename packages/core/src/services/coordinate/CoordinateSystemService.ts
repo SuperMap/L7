@@ -62,6 +62,8 @@ export default class CoordinateSystemService
 
   public offsetCenter: [number, number];
 
+  private epsgCode: string;
+
   /**
    * 重新计算当前坐标系参数
    * TODO: 使用 memoize 缓存参数以及计算结果
@@ -114,8 +116,15 @@ export default class CoordinateSystemService
     this.coordinateSystem = coordinateSystem;
   }
 
-  public getViewportCenter(map?: any): [number, number] {
+  public getEPSGCode(): string {
+    return this.epsgCode;
+  }
 
+  public setEPSGCode(epsgCode: string) {
+    this.epsgCode = epsgCode;
+  }
+
+  public getViewportCenter(map?: any): [number, number] {
     if (
       this.coordinateSystem === CoordinateSystem.METER_OFFSET &&
       this.offsetCenterTransform
@@ -183,6 +192,7 @@ export default class CoordinateSystemService
       flipY,
       highPrecision: true,
       coordinateSystem: this.coordinateSystem,
+      epsgCode: this.epsgCode
     });
 
     let viewMatrix = this.cameraService.getViewMatrix();

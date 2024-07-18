@@ -39,6 +39,8 @@ export interface ICoordinateSystemService {
   refresh(offset?: [number, number], lngLatExtent?: Array<number>): void;
   getCoordinateSystem(): CoordinateSystem;
   setCoordinateSystem(coordinateSystem: CoordinateSystem): void;
+  setEPSGCode(epagCode: string): void;
+  getEPSGCode(): string;
   getViewportCenter(map?: any): [number, number];
   getViewportCenterProjection(): [number, number, number, number];
   getPixelsPerDegree(): [number, number, number];

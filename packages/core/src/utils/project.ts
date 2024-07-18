@@ -27,7 +27,8 @@ export function getDistanceScales({
   scale,
   highPrecision = false,
   flipY = false,
-  coordinateSystem
+  coordinateSystem,
+  epsgCode
 }: Partial<{
   latitude: number;
   zoom: number;
@@ -35,7 +36,8 @@ export function getDistanceScales({
   lngLatExtent: Array<number>;
   highPrecision: boolean;
   flipY: boolean;
-  coordinateSystem:CoordinateSystem
+  coordinateSystem: CoordinateSystem;
+  epsgCode: string;
 }>): IDistanceScales {
   // Calculate scale from zoom if not provided
   scale = scale !== undefined ? scale : Math.pow(2, zoom);
@@ -55,7 +57,11 @@ export function getDistanceScales({
   const width = lngLatExtent[2] - lngLatExtent[0];
   const pixelsPerDegreeX = worldSize / width;
   let pixelsPerDegreeY = pixelsPerDegreeX;
-  if (coordinateSystem && coordinateSystem === CoordinateSystem.LNGLAT_OFFSET) {
+  if (
+    coordinateSystem &&
+    coordinateSystem === CoordinateSystem.LNGLAT_OFFSET &&
+    epsgCode === 'EPSG:3857'
+  ) {
     pixelsPerDegreeY = pixelsPerDegreeY / latCosine;
   }
 

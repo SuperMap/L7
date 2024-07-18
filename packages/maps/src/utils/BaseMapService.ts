@@ -26,7 +26,7 @@ import 'reflect-metadata';
 import { Version } from '../version';
 import { ISimpleMapCoord, SimpleMapCoord } from './simpleMapCoord';
 import { MapTheme } from './theme';
-import { getCoordinateSystem } from '../mapbox/utils';
+import { getCoordinateSystem, getEPSGCode } from '../mapbox/utils';
 const EventMap: {
   [key: string]: any;
 } = {
@@ -374,6 +374,7 @@ export default abstract class BaseMapService<T>
   protected updateCoordinateSystemService() {
     const { offsetCoordinate = true } = this.config;
     // set coordinate system
-    this.coordinateSystemService.setCoordinateSystem(getCoordinateSystem(this.map, offsetCoordinate))
+    this.coordinateSystemService.setCoordinateSystem(getCoordinateSystem(this.map, offsetCoordinate));
+    this.coordinateSystemService.setEPSGCode(getEPSGCode(this.map));
   }
 }

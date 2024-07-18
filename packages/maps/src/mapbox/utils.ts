@@ -141,6 +141,12 @@ export function getCoordinateSystem(
     return CoordinateSystem.LNGLAT;
   }
 }
+export function getEPSGCode(map: any): string {
+  if (!map) {
+    return '';
+  }
+  return map.getCRS().epsgCode;
+}
 // 当前级别一张瓦片代表的地理宽度
 function getResolutionRatio(zoom: number, map: mapboxgl.Map) {
   const extent = getCRSExtent(map);
