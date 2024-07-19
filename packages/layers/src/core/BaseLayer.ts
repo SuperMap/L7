@@ -729,7 +729,11 @@ export default class BaseLayer<ChildLayerStyleOptions = {}>
     this.encodeStyle(newOption);
 
     this.updateLayerConfig(newOption);
-
+    const needUpdateStyleAttributesOptions = ['segmentNumber', 'coverage', 'angle']
+    const isInit = Object.keys(rest).some(key=>needUpdateStyleAttributesOptions.includes(key))
+    if (isInit) {
+      this.hooks.init.promise();
+    }
     return this;
   }
 
