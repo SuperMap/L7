@@ -1,0 +1,2 @@
+from,to,value,type,lng1,lat1,lng2,lat2
+保山,西安,0.34,move_in,108.9131417,23.826245,108.85,23.85

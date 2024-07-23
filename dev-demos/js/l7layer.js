@@ -11,7 +11,7 @@ var data = [
     h: 61407,
     mag: 8.4,
     capacity: 67200,
-    v: 1,
+    v: 100,
     name: '铁路新村(华池路)',
     icon: 'icon1',
   },
@@ -23,7 +23,7 @@ var data = [
     m: '东方',
     j: 100.05,
     h: 59838,
-    v: 2,
+    v: 200,
     mag: 8.4,
     capacity: 6720,
     name: '金元坊',
@@ -145,7 +145,49 @@ export function addBaseLayer() {
 
   l7Layer3.source(source2.data).color('green').shape('fill');
 }
-
+function cretePoint(map, data1 = data) {
+  const pointSource = {
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Point',
+            coordinates: [100.05, 10.05],
+          },
+        },
+        {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Point',
+            coordinates: [100, 10],
+          },
+        },
+      ],
+    },
+  };
+  data1.forEach((item, index) => {
+    const { j: lng, w: lat } = item;
+    pointSource.data.features[index].geometry.coordinates = [lng, lat];
+    // new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
+  });
+  console.log(pointSource);
+  const layer = {
+    id: 'circle',
+    type: 'circle',
+    source: pointSource,
+    paint: {
+      'circle-radius': 20,
+      'circle-color': 'blue',
+      'circle-opacity': 1,
+    },
+  };
+  map.addLayer(layer);
+}
 export function createMarker(map, data1 = data) {
   data1.forEach((item) => {
     const { j: lng, w: lat } = item;
@@ -205,10 +247,32 @@ export function createButtons(map, scene) {
     creatIconPoint: () => creatIconPoint(data, map),
     creaWallLine: () => creaWallLine(source.data, map),
     creatTextPolygon: () => creatTextPolygon(source2.data, map),
-    create3DColumnLayer: () => create3DColumnLayer(data, map),
-    createAnimatePoint: () => createAnimatePoint(data, map),
-    createShpePoint: () => createShpePoint(data, map),
-    creatRadarPoint: () => creatRadarPoint(data, map),
+    create3DColumnLayer: () => {
+      // create3DColumnLayer(data, map);
+      // createMarker(map); //红色
+      cretePoint(map); //蓝色
+
+      // console.log('l7laery' + l7laery.id);
+      // window['l7laery0'] = l7laery;
+    },
+    createAnimatePoint: () => {
+      const l7laery = createAnimatePoint(data, map);
+      cretePoint(map); //蓝色
+      createMarker(map); //红色
+
+      // console.log('l7laery' + l7laery.id);
+      // window['l7laery0'] = l7laery;
+    },
+    createShpePoint: () => {
+      const l7laery = createShpePoint(data, map);
+      window['l7laery1'] = l7laery;
+      console.log('l7laery' + l7laery.id);
+    },
+    creatRadarPoint: () => {
+      const l7laery = creatRadarPoint(data, map);
+      window['l7laery2'] = l7laery;
+      console.log('l7laery' + l7laery.id);
+    },
     creatTextPoint: () => creatTextPoint(data, map),
     creatImagePoint: () => creatImagePoint(data, map),
     creatPathLine: () => creatPathLine(data, map),
@@ -217,7 +281,7 @@ export function createButtons(map, scene) {
     crea3DExtrude: () => crea3DExtrude(source2.data, map),
     createHeat: () => createHeat(data, map),
     createheatmap3D: () => createheatmap3D(data, map),
-    creategrid: () => creategrid(data, map),
+    creategrid: () => creategrid(data, map, scene),
     creategrid3D: () => creategrid3D(data, map),
     createMvtLayer: () => createMvtLayer(map),
     createMoreShpePoint: () => createMoreShpePoint(data, map),
@@ -233,7 +297,7 @@ export function createButtons(map, scene) {
     createCircleArc: () => createCircleArc(map),
     createWindAnimate: () => createWindAnimate(map),
     createLineAnimate: () => createLineAnimate(map),
-    addChart: () => addChart(scene),
+    addChart: () => addChart(scene, map),
     createOD: () => createOD(map, scene),
     createOD_MS: () => createOD_MS(map, scene),
   };
@@ -338,13 +402,48 @@ function createCircleArc(map) {
             y1: 'lat2',
           },
         })
-        .size(1)
+        .size(2)
         .shape('greatcircle')
         .color('#8C1EB2')
         .style({
-          opacity: 0.8,
-        });
+          // opacity: 0.8,
+          // lineType: 'solid',
+          // opacity: 1,
+          // dashArray: [1, 0],
+          // iconStep: 20,
+          segmentNumber: 10,
+        })
+        .animate(true);
       map.addLayer(layer);
+      setTimeout(() => {
+        console.log('stylechange segmentNumbersegmentNumber');
+        l7Layer.style({ segmentNumber: 50 });
+        layer.reRender();
+      }, 2000);
+
+      // var layer1 = new mapboxgl.supermap.L7Layer({ type: 'LineLayer' });
+      // var l7Layer1 = layer1.getL7Layer();
+      // l7Layer1
+      //   .source(data, {
+      //     parser: {
+      //       type: 'csv',
+      //       x: 'lng1',
+      //       y: 'lat1',
+      //       x1: 'lng2',
+      //       y1: 'lat2',
+      //     },
+      //   })
+      //   .size(1)
+      //   .shape('greatcircle')
+      //   .color('red')
+      //   .style({
+      //     // opacity: 0.8,
+      //     // // lineType: 'solid',
+      //     // // opacity: 1,
+      //     // dashArray: [1, 0],
+      //     // iconStep: 20,
+      //   });
+      // map.addLayer(layer1);
     });
 }
 // 风场动画 动画效果不对
@@ -369,8 +468,9 @@ function createWindAnimate(map) {
         })
         .size(1)
         .shape('arc')
-        .color('#6495ED')
+        .color('red')
         .animate({
+          enable: true,
           duration: 4,
           interval: 0.2,
           trailLength: 0.6,
@@ -528,34 +628,62 @@ function createOD_MS(map, scene) {
     'https://gw.alipayobjects.com/zos/bmw-prod/0ca1668e-38c2-4010-8568-b57cb33839b9.svg',
   );
 
-  fetch(
-    './datas/flight.json',
-  )
+  fetch('./datas/flight.json')
     .then((d) => d.json())
     .then((data) => {
-      var worldLine = new mapboxgl.supermap.L7Layer({ type: 'LineLayer' });
-      var l7Layer = worldLine.getL7Layer();
+      var layer = new mapboxgl.supermap.L7Layer({ type: 'LineLayer' });
+      var l7Layer = layer.getL7Layer();
       l7Layer
-        .source({
-          data,
+        .source(data, {
           parser: {
             type: 'json',
-            x: 'X',
-            y: 'Y',
+            x: '起飞机场x',
+            y: '起飞机场y',
             x1: '到达城市x',
             y1: '到达城市y',
           },
         })
         .shape('greatcircle')
         .color('#ff6b34')
-        .size(1)
+        .size(10)
         .style({
           lineType: 'dash',
           dashArray: [1, 0],
           opacity: 1,
-          segmentNumber: 30,
+          segmentNumber: 50,
         });
-      map.addLayer(worldLine);
+      map.addLayer(layer);
+      l7Layer.on('click', (target) => {
+        console.log('greatcircle', target);
+      });
+      var layer2 = new mapboxgl.supermap.L7Layer({ type: 'LineLayer' });
+      layer2
+        .getL7Layer()
+        .source(data, {
+          parser: {
+            type: 'json',
+            x: '起飞机场x',
+            y: '起飞机场y',
+            x1: '到达城市x',
+            y1: '到达城市y',
+          },
+        })
+        .color('red')
+        .texture('plane')
+        .shape('greatcircle')
+        .size(50)
+        .animate({
+          duration: 5,
+          interval: 0.2,
+          trailLength: 0.05,
+        })
+        .style({
+          segmentNumber: 50,
+          textureBlend: 'replace',
+          lineTexture: true, // 开启线的贴图功能
+          iconStep: 10, // 设置贴图纹理的间距
+        });
+      map.addLayer(layer2);
     });
 }
 
@@ -734,7 +862,7 @@ export function create3DColumnLayer(data, map) {
     .size('h', (h) => {
       return [6, 6, h / 500];
     })
-    .color('name', ['#739DFF', '#61FCBF', '#FFDE74', '#FF896F']);
+    .color('green');
   map.addLayer(layer);
 }
 
@@ -768,6 +896,7 @@ export function createShpePoint(data, map) {
       strokeWidth: 2,
     });
   map.addLayer(layer);
+  return l7Layer;
 }
 
 export function createAnimatePoint(data, map) {
@@ -783,13 +912,18 @@ export function createAnimatePoint(data, map) {
     })
     .shape('circle')
     .active(true)
-    .animate(true)
-    .size(40)
+    .animate({
+      enable: true,
+      speed: 2,
+    })
+    .size(80)
     .color('#ffa842')
     .style({
       // offsets: [ 40, 40 ]
     });
   map.addLayer(layer);
+  console.log('createAnimatePoint', layer.id);
+  return l7Layer;
 }
 
 export function creatRadarPoint(data, map) {
@@ -807,10 +941,12 @@ export function creatRadarPoint(data, map) {
     .size(100)
     .color('#d00')
     .style({
-      speed: 5,
+      speed: 10,
     })
     .animate(true);
   map.addLayer(layer);
+  console.log(layer.id);
+  return l7Layer;
 }
 export function creatTextPoint(data, map) {
   var layer = new mapboxgl.supermap.L7Layer({ type: 'PointLayer' });
@@ -1002,7 +1138,7 @@ export function creatPathLine(data, map) {
   map.addLayer(layer);
 }
 
-function addChart(scene) {
+function addChart(scene, map) {
   fetch(
     'https://gw.alipayobjects.com/os/basement_prod/0b96cca4-7e83-449a-93d0-2a77053e74ab.json',
   )
@@ -1012,6 +1148,8 @@ function addChart(scene) {
         const el = document.createElement('div');
         const total =
           item.gdp.Agriculture + item.gdp.Industry + item.gdp.Service;
+        const coordinates = item.coordinates;
+        new mapboxgl.Marker().setLngLat(coordinates).addTo(map);
 
         const size = Math.min(parseInt(total / 30000, 10), 70);
         if (size < 30) {
@@ -1073,12 +1211,11 @@ export function creatRain(data, map) {
     .style({
       // opacity: 0.5,
       mapTexture: './js/A_w2SFSZJp4nIAAAAAAAAAAAAAARQnAQ.png', // rain
-      center: [100, 10],
+      center: [110, 30],
       spriteCount: 6000,
-      spriteRadius: 10,
+      spriteRadius: 100,
       spriteTop: 2500000,
       spriteUpdate: 20000,
-      spriteScale: 0.6,
     });
   map.addLayer(layer);
 }
@@ -1380,9 +1517,10 @@ export function createheatmap3D(data, map) {
   map.addLayer(layer);
 }
 
-export function creategrid(data, map) {
+export function creategrid(data, map, scene) {
   var layer = new mapboxgl.supermap.L7Layer({ type: 'HeatmapLayer' });
   var l7Layer = layer.getL7Layer();
+  console.log(data);
   l7Layer
     .source(data, {
       parser: {
@@ -1393,7 +1531,7 @@ export function creategrid(data, map) {
       transforms: [
         {
           type: 'grid',
-          size: 200,
+          size: 20000,
           field: 'v',
           method: 'sum',
         },
@@ -1404,7 +1542,11 @@ export function creategrid(data, map) {
       coverage: 1,
       angle: 0,
     })
-    .color('red');
+    .color('yellow');
+  setTimeout(() => {
+    console.log(' l7Layer.style({ coverage: 0.5 });');
+    l7Layer.style({ angle: 20 });
+  }, 2000);
   map.addLayer(layer);
 }
 export function creategrid3D(data, map) {
@@ -1420,7 +1562,7 @@ export function creategrid3D(data, map) {
       transforms: [
         {
           type: 'hexagon',
-          size: 250,
+          size: 2000,
           field: 'v',
           method: 'sum',
         },
@@ -1446,5 +1588,9 @@ export function creategrid3D(data, map) {
       '#DEFAC0',
       '#ECFFB1',
     ]);
+  setTimeout(() => {
+    console.log(' l7Layer.style({ coverage: 0.5 });');
+    l7Layer.style({ angle: 20 });
+  }, 2000);
   map.addLayer(layer);
 }

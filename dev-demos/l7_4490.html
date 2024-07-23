@@ -37,10 +37,15 @@
         margin: 10px;
       }
     </style>
-    <link rel="stylesheet" type="text/css" href="./js/iclient-mapboxgl.css"></link>
-    <script type="text/javascript" src="./js/mapbox-gl-enhance.js"></script>
-    <script type="text/javascript" src="../mapboxgl-l7-render/dist/index.js"></script> <!-- l7-mapboxgl -->
-    <script type="text/javascript" src="./js/iclient-mapboxgl-es6.js"></script>
+   <link rel="stylesheet" type="text/css" href="./js/mapbox-gl.css">
+  </link> 
+  <link rel="stylesheet" type="text/css" href="./js/iclient-mapboxgl.css">
+  </link>
+  <script src="https://cdn.jsdelivr.net/npm/@antv/g2@4.2.8/dist/g2.min.js"></script>
+ 
+  <script type="text/javascript" src="./js/mapbox-gl-enhance.js"></script>
+  <script type="text/javascript" src="../mapboxgl-l7-render/dist/index.js"></script>
+  <script type="text/javascript" src="./js/iclient-mapboxgl-es6.js"></script>
   </head>
 
   <body>
@@ -81,20 +86,17 @@
         },
         crs: 'EPSG:4490',
         center: [100, 10],
-        zoom: 13
+        zoom: 6
       });
 
       map.on('load', () => {
         window.map = map;
-        createButtons(map)
         createMarker(map)
         createMarker(map, data2)
 
         map.getL7Scene().then(scene=>{
-            scene.on('click', (ev) => {
-              console.log(ev)
-            });
-        })
+            createButtons(map, scene)
+          })
       });
       
    </script>

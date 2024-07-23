@@ -37,11 +37,12 @@
         margin: 10px;
       }
     </style>
-    <link rel="stylesheet" type="text/css" href="./js/iclient-mapboxgl.css"></link>
     <script src="https://cdn.jsdelivr.net/npm/@antv/g2@4.2.8/dist/g2.min.js"></script>
 
-    <script type="text/javascript" src="https://iclient.supermap.io/web/libs/mapbox-gl-js-enhance/1.12.1-3/mapbox-gl-enhance.js"></script>
-    <script type="text/javascript" src="./dist/index.js"></script> <!-- l7-mapboxgl -->
+    <link rel="stylesheet" type="text/css" href="./js/iclient-mapboxgl.css">
+    </link>
+    <script type="text/javascript" src="./js/mapbox-gl-enhance.js"></script>
+    <script type="text/javascript" src="../mapboxgl-l7-render/dist/index.js"></script>
     <script type="text/javascript" src="./js/iclient-mapboxgl-es6.js"></script>
   </head>
 
@@ -60,7 +61,7 @@
         .initMap(host + '/iserver/services/map-mvt-landuse/rest/maps/landuse', {
           type: 'vector-tile',
           mapOptions: {
-            zoom: 1,
+            zoom: 10,
             pitch: 90
           }
         })
@@ -207,11 +208,18 @@
             creategrid:()=>creategrid(data, map),
             creategrid3D:()=>creategrid3D(data, map),
             createMvtLayer:()=>createMvtLayer(map),
-            createOcean: ()=>createOcean(data, map),
-            createWater: ()=>createWater(data, map),
+            createOcean: ()=>createOcean(source2.data, map,),
+            createWater: ()=>createWater(source2.data, map),
             createCityBuildings: ()=>createCityBuildings(data, map),
             creatRain: ()=>creatRain(data, map),
             addChart: () => addChart(scene,map),
+            createOD_MS: () => createOD_MS(map,scene,),
+            createOD: () => createOD(map,scene,),
+            createHexagonColumn: () => createHexagonColumn(map,data),
+            createGridMap: () => createGridMap(map,data),
+            createCircleArc: () => createCircleArc(map,),
+            createWindAnimate: () => createWindAnimate(map,),
+            createLineAnimate: () => createLineAnimate(map,),
 
           }
         
@@ -226,6 +234,386 @@
           })
          
         }
+
+        // 3d蜂窝热力图出现两条横杠
+function createHexagonColumn(map, data) {
+  fetch('./js/7359a5e9-3c5e-453f-b207-bc892fb23b84.csv')
+    .then((res) => res.text())
+    .then((data1) => {
+      var layer = new mapboxgl.supermap.L7Layer({ type: 'HeatmapLayer' });
+      var l7Layer = layer.getL7Layer();
+      console.log(data)
+      l7Layer
+        .source(data, {
+          parser: {
+            type: 'json',
+            x: 'j',
+            y: 'w',
+          },
+          transforms: [
+            {
+              type: 'hexagon',
+              size: 2000,
+              field: 'v',
+              method: 'sum',
+            },
+          ],
+        })
+        .size(100)
+        .shape('hexagonColumn')
+        .color(
+          'count',
+          [
+            '#FF4818',
+            '#F7B74A',
+            '#FFF598',
+            '#FF40F3',
+            '#9415FF',
+            '#421EB2',
+          ].reverse(),
+        )
+        .style({
+          coverage: 0.9,
+          angle: 0,
+        });
+      map.addLayer(layer);
+    });
+}
+// 格网地图出现两条横杠
+function createGridMap(map,data) {
+  fetch('./js/3dadb1f5-8f54-4449-8206-72db6e142c40.json')
+    .then((res) => res.json())
+    .then((data1) => {
+      var linelayer = new mapboxgl.supermap.L7Layer({
+        type: 'HeatmapLayer',
+        options: { autoFit: true },
+      });
+      linelayer
+        .getL7Layer()
+        .source(data, {
+          parser: {
+            type: 'json',
+            x: 'j',
+            y: 'w',
+          },
+          transforms: [
+            {
+              type: 'hexagon',
+              size: 5 * 100000,
+            },
+          ],
+        })
+        .shape('circle')
+        .active(false)
+        .color('red')
+        .style({
+          coverage: 0.7,
+          angle: 0,
+        });
+      map.addLayer(linelayer);
+    });
+}
+// 大圆航线没绘制
+function createCircleArc(map) {
+  fetch('./js/UEXQMifxtkQlYfChpPwT1.txt')
+    .then((res) => res.text())
+    .then((data) => {
+      var layer = new mapboxgl.supermap.L7Layer({ type: 'LineLayer' });
+      var l7Layer = layer.getL7Layer();
+    console.log(data)
+
+      l7Layer
+        .source(data, {
+          parser: {
+            type: 'csv',
+            x: 'lng1',
+            y: 'lat1',
+            x1: 'lng2',
+            y1: 'lat2',
+          },
+        })
+        .size(20)
+        .shape('greatcircle')
+        .color('#8C1EB2')
+        .style({
+          // opacity: 0.8,
+          // lineType: 'solid',
+          // opacity: 1,
+          // dashArray: [1, 0],
+          // iconStep: 20,
+          segmentNumber: 50,
+        })
+        .animate(true);
+      map.addLayer(layer);
+      setTimeout(() => {
+        console.log('stylechange segmentNumbersegmentNumber');
+        l7Layer.style({ segmentNumber: 50 });
+        // layer.reRender();
+      }, 2000);
+
+      // var layer1 = new mapboxgl.supermap.L7Layer({ type: 'LineLayer' });
+      // var l7Layer1 = layer1.getL7Layer();
+      // l7Layer1
+      //   .source(data, {
+      //     parser: {
+      //       type: 'csv',
+      //       x: 'lng1',
+      //       y: 'lat1',
+      //       x1: 'lng2',
+      //       y1: 'lat2',
+      //     },
+      //   })
+      //   .size(1)
+      //   .shape('greatcircle')
+      //   .color('red')
+      //   .style({
+      //     // opacity: 0.8,
+      //     // // lineType: 'solid',
+      //     // // opacity: 1,
+      //     // dashArray: [1, 0],
+      //     // iconStep: 20,
+      //   });
+      // map.addLayer(layer1);
+    });
+}
+// 风场动画 动画效果不对
+function createWindAnimate(map) {
+  fetch('./js/7455fead-1dc0-458d-b91a-fb4cf99e701e.txt')
+    .then((res) => res.text())
+    .then((data) => {
+      var linelayer = new mapboxgl.supermap.L7Layer({
+        type: 'LineLayer',
+        options: { blend: 'normal' },
+      });
+      linelayer
+        .getL7Layer()
+        .source(data, {
+          parser: {
+            type: 'csv',
+            x: 'lng1',
+            y: 'lat1',
+            x1: 'lng2',
+            y1: 'lat2',
+          },
+        })
+        .size(1)
+        .shape('arc')
+        .color('red')
+        .animate({
+          enable: true,
+          duration: 4,
+          interval: 0.2,
+          trailLength: 0.6,
+        });
+      map.addLayer(linelayer);
+    });
+}
+// 直线动画 不显示
+function createLineAnimate(map) {
+  fetch('./js/UEXQMifxtkQlYfChpPwT1.txt')
+    .then((res) => res.text())
+    .then((data) => {
+      var layer = new mapboxgl.supermap.L7Layer({
+        type: 'LineLayer',
+        options: {
+          blend: 'normal',
+        },
+      });
+      var l7Layer = layer.getL7Layer();
+      l7Layer
+        .source(data, {
+          parser: {
+            type: 'csv',
+            x: 'lng1',
+            y: 'lat1',
+            x1: 'lng2',
+            y1: 'lat2',
+          },
+        })
+        .size(10)
+        .shape('greatcircle')
+        .animate({
+          enable: true,
+          interval: 0.1,
+          trailLength: 0.5,
+          duration: 2,
+        })
+        .color('#8C1EB2')
+        .style({
+          opacity: 0.8,
+        });
+      map.addLayer(layer);
+    });
+}
+
+// OD图
+function createOD(map, scene) {
+  scene.addImage(
+    'plane',
+    'https://gw.alipayobjects.com/zos/bmw-prod/0ca1668e-38c2-4010-8568-b57cb33839b9.svg',
+  );
+  Promise.all([
+    fetch(
+      'https://gw.alipayobjects.com/os/bmw-prod/2960e1fc-b543-480f-a65e-d14c229dd777.json',
+    ).then((d) => d.json()),
+    fetch(
+      'https://gw.alipayobjects.com/os/basement_prod/4472780b-fea1-4fc2-9e4b-3ca716933dc7.json',
+    ).then((d) => d.text()),
+    fetch(
+      'https://gw.alipayobjects.com/os/basement_prod/a5ac7bce-181b-40d1-8a16-271356264ad8.json',
+    ).then((d) => d.text()),
+  ]).then(function onLoad([world, dot, flyline]) {
+    const dotData = eval(dot);
+    // @ts-ignore
+    const flydata = eval(flyline).map((item) => {
+      // @ts-ignore
+      const latlng1 = item.from.split(',').map((e) => {
+        return e * 1;
+      });
+      // @ts-ignore
+      const latlng2 = item.to.split(',').map((e) => {
+        return e * 1;
+      });
+      return { coord: [latlng1, latlng2] };
+    });
+
+    var worldLine = new mapboxgl.supermap.L7Layer({ type: 'LineLayer' });
+    var l7Layer = worldLine.getL7Layer();
+    l7Layer.source(world).color('#41fc9d').size(0.5).style({
+      opacity: 0.4,
+    });
+
+    var dotPoint = new mapboxgl.supermap.L7Layer({ type: 'PointLayer' });
+    dotPoint
+      .getL7Layer()
+      .source(dotData, {
+        parser: {
+          type: 'json',
+          x: 'lng',
+          y: 'lat',
+        },
+      })
+      .shape('circle')
+      .color('#ffed11')
+      .animate(true)
+      .size(40);
+
+    var flyLine = new mapboxgl.supermap.L7Layer({
+      type: 'LineLayer',
+      options: { blend: 'normal' },
+    });
+    flyLine
+      .getL7Layer()
+      .source(flydata, {
+        parser: {
+          type: 'json',
+          coordinates: 'coord',
+        },
+      })
+      .color('#ff6b34')
+      .texture('plane')
+      .shape('arc')
+      .size(15)
+      .animate({
+        duration: 1,
+        interval: 0.2,
+        trailLength: 0.05,
+      })
+      .style({
+        textureBlend: 'replace',
+        lineTexture: true, // 开启线的贴图功能
+        iconStep: 10, // 设置贴图纹理的间距
+      });
+    var flyLine2 = new mapboxgl.supermap.L7Layer({
+      type: 'LineLayer',
+      options: { blend: 'normal' },
+    });
+    flyLine2
+      .getL7Layer()
+      .source(flydata, {
+        parser: {
+          type: 'json',
+          coordinates: 'coord',
+        },
+      })
+      .color('#ff6b34')
+      .shape('arc')
+      .size(1)
+      .style({
+        lineType: 'dash',
+        dashArray: [5, 5],
+        opacity: 0.5,
+      });
+    map.addLayer(worldLine);
+    map.addLayer(dotPoint);
+    map.addLayer(flyLine2);
+    map.addLayer(flyLine);
+  });
+}
+        // OD图
+function createOD_MS(map, scene) {
+  scene.addImage(
+    'plane',
+    'https://gw.alipayobjects.com/zos/bmw-prod/0ca1668e-38c2-4010-8568-b57cb33839b9.svg',
+  );
+
+  fetch('./datas/flight.json')
+    .then((d) => d.json())
+    .then((data) => {
+      var layer = new mapboxgl.supermap.L7Layer({ type: 'LineLayer' });
+      var l7Layer = layer.getL7Layer();
+      l7Layer
+        .source(data, {
+          parser: {
+            type: 'json',
+            x: '起飞机场x',
+            y: '起飞机场y',
+            x1: '到达城市x',
+            y1: '到达城市y',
+          },
+        })
+        .shape('greatcircle')
+        .color('#ff6b34')
+        .size(1)
+        .style({
+          lineType: 'dash',
+          dashArray: [1, 0],
+          opacity: 1,
+          segmentNumber: 50,
+        });
+      map.addLayer(layer);
+
+      var layer2 = new mapboxgl.supermap.L7Layer({ type: 'LineLayer' });
+      layer2
+        .getL7Layer()
+        .source(data, {
+          parser: {
+            type: 'json',
+            x: '起飞机场x',
+            y: '起飞机场y',
+            x1: '到达城市x',
+            y1: '到达城市y',
+          },
+        })
+        .color('red')
+        .texture('plane')
+        .shape('greatcircle')
+        .size(50)
+        .animate({
+          duration: 5,
+          interval: 0.2,
+          trailLength: 0.05,
+        })
+        .style({
+          segmentNumber: 50,
+          textureBlend: 'replace',
+          lineTexture: true, // 开启线的贴图功能
+          iconStep: 10, // 设置贴图纹理的间距
+        });
+      map.addLayer(layer2);
+    });
+}
+
        
         function addChart(scene, map) {
   fetch(
@@ -233,17 +621,37 @@
   )
     .then((res) => res.json())
     .then((data) => {
-      data.nodes.forEach(function (item) {
+      const nodes = [{
+          "gdp": {
+              "Agriculture": 208995,
+              "Industry": 3326504,
+              "Service": 13880754
+          },
+          "name": "United States of America",
+          "coordinates": [108.9131417, 23.826245],
+          "id": "United States of America"
+      },
+      {
+          "gdp": {
+              "Agriculture": 208995,
+              "Industry": 3326504,
+              "Service": 13880754
+          },
+          "name": "United States of America",
+          "coordinates":[108.85, 23.85],
+          "id": "United States of America"
+      }]
+      nodes.forEach(function (item) {
         const el = document.createElement('div');
         const total =
           item.gdp.Agriculture + item.gdp.Industry + item.gdp.Service;
         const coordinates = item.coordinates;
-        new mapboxgl.Marker().setLngLat(coordinates).addTo(map);
+        // new mapboxgl.Marker().setLngLat(coordinates).addTo(map);
 
         const size = Math.min(parseInt(total / 30000, 10), 70);
-        if (size < 30) {
-          return;
-        }
+        // if (size < 30) {
+        //   return;
+        // }
         const itemData = [
           {
             item: 'Agriculture',
@@ -342,10 +750,11 @@
         )
         .then(data => data.json())
         .then(({ lakeData }) => {
-              var layer = new mapboxgl.supermap.L7Layer({ type: 'PolygonLayer',options:{ autoFit: true } });
+          
+            var layer = new mapboxgl.supermap.L7Layer({ type: 'PolygonLayer',options:{ autoFit: true } });
               var l7Layer = layer.getL7Layer();
                 l7Layer
-                .source(lakeData)
+                .source(data)
                 .shape('water')
                 .color('#1E90FF')
                 .style({
@@ -367,7 +776,7 @@
               var layer = new mapboxgl.supermap.L7Layer({ type: 'PolygonLayer',options:{ autoFit: true } });
               var l7Layer = layer.getL7Layer();
                 l7Layer
-                .source(lakeData)
+                .source(data)
                 .shape('ocean')
                 .color('#1E90FF')
                 .style({

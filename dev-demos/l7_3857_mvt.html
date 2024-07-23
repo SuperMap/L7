@@ -1,0 +1,187 @@
+<!--********************************************************************
+* Copyright© 2000 - 2023 SuperMap Software Co.Ltd. All rights reserved.
+*********************************************************************-->
+<!--********************************************************************
+* 该示例需要引入 
+* G6 (https://github.com/antvis/G6)
+*********************************************************************-->
+<!DOCTYPE html>
+<html>
+  <link>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>3857</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+      }
+      #map {
+        width: 100%;
+        height: 100%;
+      }
+      #buttons {
+        position: fixed;
+        top:10px;
+        padding:10px;
+        width: 100%;
+        display: flex;
+        flex-flow: wrap
+      }
+      #buttons button {
+        display: block;
+        width: 120px;
+        margin: 10px;
+      }
+      /* .mapboxgl-popup {
+        pointer-events: auto;
+      } */
+    </style>
+    <link rel="stylesheet" type="text/css" href="./js/iclient-mapboxgl.css">
+    </link>
+    <script type="text/javascript" src="./js/mapbox-gl-enhance.js"></script>
+    <script type="text/javascript" src="../mapboxgl-l7-render/dist/index.js"></script>
+    <script type="text/javascript" src="./js/iclient-mapboxgl-es6.js"></script>
+  </head>
+
+  <body>
+    <div id="map"></div>
+    <div id="buttons"></div>
+    <script type="text/javascript">
+      var host = window.isLocal ? window.server : 'https://iserver.supermap.io';
+      var attribution =
+        "<a href='https://www.mapbox.com/about/maps/' target='_blank'>© Mapbox </a>" +
+        " with <span>© <a href='https://iclient.supermap.io' target='_blank'>SuperMap iClient</a> | </span>" +
+        " Map Data <span>© <a href='http://support.supermap.com.cn/product/iServer.aspx' target='_blank'>SuperMap iServer</a></span> ";
+
+      var tileURL = host + '/iserver/services/map-china400/rest/maps/ChinaDark/zxyTileImage.png?z={z}&x={x}&y={y}';
+      const serverUrl = 'http://172.16.14.75:8090/iserver/services/map-BeiJingGongYuan/restjsr/v1/vectortile/maps/北京市休闲垂钓园_3857';
+        const serverName = '北京市休闲垂钓园_3857';
+        const center = [
+            116.7034356040623,
+            40.21562512387371
+        ];
+        const zoom = 4;
+        const extent = [
+            38344577.8058349,
+            2380652.6184502926,
+            40999977.947363149,
+            5036052.759978544
+        ] //indexbounds
+
+        const style = {
+            "version": 8,
+            "sprite": {},
+            "glyphs": {},
+            "sources": {},
+            "layers": [
+                {
+                    "id": "ms-background",
+                    "type": "background",
+                    "metadata": {},
+                    "paint": {
+                        "background-color": "#242424"
+                    }
+                }
+            ]
+        }
+      
+        const map = new mapboxgl.Map({
+          container: 'map',
+          style: style,
+          crs: 'EPSG:3857',
+          center: [
+              116.7034356040623,
+              40.21562512387371
+          ],
+          zoom: 7.5,
+          renderWorldCopies: false,
+        });
+
+         
+          map.on('load', () => {
+            console.log('load');
+            window.map = map;
+            fetch('./datas/beijin_R.json')
+            .then((response) => response.json())
+            .then((dataReq) => {
+              console.log(dataReq)
+              map.addSource('my-source', {
+                type: 'geojson',
+                data: dataReq,
+              });
+              map.addLayer({
+                id: 'my-layer',
+                source: 'my-source',
+                type: 'fill',
+                layout: {},
+                paint: {
+                  'fill-color': '#0ff',
+                  'fill-opacity': 0.5,
+                },
+              });
+                const layer= getAnimateMvt()
+                map.addLayer(layer);
+                console.log(l7Layer.pickingService);
+
+                new mapboxgl.Popup()
+                .setLngLat([115.5692335649029,39.90198017409483])
+                .setHTML('<div>dddddddddfdsfsfddddddddddddddddddddddddddddddd</div>')
+                .addTo(map);
+            });
+        
+          });
+          function getAnimateMvt() {
+            var layer = new mapboxgl.supermap.L7Layer({
+              type: 'PointLayer',
+              options: {
+                "name": serverName + "@北京市休闲垂钓园(0_24)",
+                "sourceLayer": serverName + "@北京市休闲垂钓园",
+                "minzoom": 0,
+                "maxzoom": 24,
+                "visible": true
+              } 
+            });
+            var l7Layer = layer.getL7Layer();
+            l7Layer.on('click', (target) => {
+              console.log(target)
+            });
+            map.on('click', (e) => {
+              console.log('click')
+            })
+            const dom = document.getElementById('map')
+            dom.addEventListener('click',()=>{console.log("dom click")}, undefined);
+
+            l7Layer
+              .source(
+                serverUrl + "/tiles/{z}/{x}/{y}.mvt",
+                {
+                  parser: {
+                  type: 'mvt',
+                  // extent: [115.5611791311937, 39.57086397251337, 117.35387966809024, 40.687235418333564],
+                },
+              }
+              )
+              .shape('circle')
+              .size(30)
+              .animate({
+                enable: true,
+                speed: 1,
+                rings: 3,
+              })
+              .color('#EE4D5A')
+              .style({
+                opacity: 0.9,
+              });
+              window.l7Layer= l7Layer
+              l7Layer.pickingService
+              return layer
+          }
+     
+  
+    </script>
+  </body>
+</html>

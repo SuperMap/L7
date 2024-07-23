@@ -23,42 +23,49 @@
         width: 100%;
         height: 100%;
       }
+      #buttons {
+        position: fixed;
+        top:10px;
+        padding:10px;
+        width: 100%;
+        display: flex;
+        flex-flow: wrap;
+        z-index: 111;
+      }
+      #buttons button {
+        display: block;
+        width: 120px;
+        margin: 10px;
+      }
     </style>
-    <link rel="stylesheet" type="text/css" href="./js/iclient-mapboxgl.css"></link>
+     <link rel="stylesheet" type="text/css" href="./js/mapbox-gl.css">
+    </link> 
+    <link rel="stylesheet" type="text/css" href="./js/iclient-mapboxgl.css">
+    </link>
+    <script src="https://cdn.jsdelivr.net/npm/@antv/g2@4.2.8/dist/g2.min.js"></script>
+
     <script type="text/javascript" src="./js/mapbox-gl-enhance.js"></script>
-    <script type="text/javascript" src="../mapboxgl-l7-render\dist\index.js"></script> <!-- l7-mapboxgl -->
+    <script type="text/javascript" src="../mapboxgl-l7-render/dist/index.js"></script>
     <script type="text/javascript" src="./js/iclient-mapboxgl-es6.js"></script>
   </head>
 
   <body>
+    <div id="buttons"></div>
+
     <div id="map"></div>
-    <script type="text/javascript">
+    <script type="module">
+       import {createButtons, createMarker, data2} from './js/l7layer.js'
+      const btn = document.querySelector('button');
+      // btn.addEventListener('click', () => {
+      //   map.setZoom(12.1);
+      // });
       var host = window.isLocal ? window.server : 'https://iserver.supermap.io';
-      var attribution =
-        "<a href='https://www.mapbox.com/about/maps/' target='_blank'>© Mapbox </a>" +
-        " with <span>© <a href='https://iclient.supermap.io' target='_blank'>SuperMap iClient</a> | </span>" +
-        " Map Data <span>© <a href='http://support.supermap.com.cn/product/iServer.aspx' target='_blank'>SuperMap iServer</a></span> ";
-
-      var tileURL = host + '/iserver/services/map-china400/rest/maps/ChinaDark/zxyTileImage.png?z={z}&x={x}&y={y}';
-
-      function project_mercator(lnglat) {
-        const radians = (x) => x * (Math.PI / 180);
-        var x = lnglat.x;
-        return [radians(x) + Math.PI, Math.PI - Math.log(Math.tan(Math.PI * 0.25 + radians(lnglat.y) * 0.5))];
-      }
-      var WORLD_SCALE = 512 / (Math.PI * 2.0);
-      function project_Position(lng, lat) {
-        var WORLD_SCALE = 512 / (Math.PI * 2.0);
-        const coor = project_mercator({ x: lng, y: lat });
-        return [coor[0] * WORLD_SCALE, coor[1] * WORLD_SCALE];
-      }
-      console.log(project_mercator({ x: 10, y: 10 }));
       var features = {
         type: 'FeatureCollection',
         features: [
           {
             type: 'Feature',
-            properties: {},
+            properties: {length: 10, level:43, "value": -4},
             geometry: {
               type: 'LineString',
               coordinates: [
@@ -70,147 +77,25 @@
         ]
       };
       mapboxgl.supermap
-        .initMap(host + '/iserver/services/map-world/rest/maps/World', {
-          mapOptions: { antialias: true, zoom: 12, pitch: 45, center: [100, 10], maxZoom: 25 }
+        .initMap('http://172.16.14.44:8090/iserver/services/map-china400/rest/maps/China', {
+          mapOptions: { center: [100, 10], zoom: 20, pitch: 90,antialias: true , maxZoom: 25}
         })
         .then(function (result) {
-         
-          var map = result.map;
+          var map = result.map;    
           window.map = map;
-         
-          var data = [
-            {
-              w: 10,
-              t: 24.6,
-              s: '海南',
-              l: 11,
-              m: '东方',
-              j: 100,
-              h: '59838'
-            },
-            {
-              w: 10.05,
-              t: 24.6,
-              s: '海南',
-              l: 11,
-              m: '东方',
-              j: 100.05,
-              h: '59838'
-            }
-          ];
-
-          data.forEach((item) => {
-            const { j: lng, w: lat } = item;
-            new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
+          // createMarker(map)
+          // createMarker(map, data2)
+          // new mapboxgl.Marker().setLngLat([120.148054, 30.25413]).addTo(map)
+          map.on('click', (ev) => {
+            console.log(ev)
           });
-          var layer = new mapboxgl.supermap.L7Layer({ type: 'PointLayer' });
-          var l7Layer = layer.getL7Layer();
-          l7Layer
-            .source(data, {
-              parser: {
-                type: 'json',
-                x: 'j',
-                y: 'w'
-              }
-            })
-            .shape('circle')
-            .size(10)
-            .color('red');
-          const source = {
-            type: 'geojson',
-            data: features
-          };
-          const layer1 = {
-            id: 'line',
-            type: 'line',
-            source,
-            paint: {
-              'line-color': 'green',
-              'line-width': 20
-            }
-          };
-
-          const source2 = {
-            type: 'geojson',
-            data: {
-              type: 'FeatureCollection',
-              features: [
-                {
-                  type: 'Feature',
-                  properties: {},
-                  geometry: {
-                    type: 'Polygon',
-                    coordinates: [
-                      [
-                        [100.06, 10],
-                        [99.95, 10],
-                        [100.06, 10.06],
-                        [100.06, 10]
-                      ]
-                    ]
-                  }
-                }
-              ]
-            }
-          };
-          const layer2 = {
-            id: 'fill',
-            type: 'fill',
-            source: source2,
-            paint: {
-              'fill-color': 'rgba(255, 255, 0, 1)'
-            }
-          };
-          const pointSource = {
-            type: 'geojson',
-            data: {
-              type: 'FeatureCollection',
-              features: [
-                {
-                  type: 'Feature',
-                  properties: {},
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [100.05, 10.05]
-                  }
-                },
-                {
-                  type: 'Feature',
-                  properties: {},
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [100, 10]
-                  }
-                }
-              ]
-            }
-          };
-
-          const layer3 = {
-            id: 'circle',
-            type: 'circle',
-            source: pointSource,
-            paint: {
-              'circle-radius': 12,
-              'circle-color': 'blue',
-              'circle-opacity': 1
-            }
-          };
-          
-          var LineLayer = new mapboxgl.supermap.L7Layer({ type: 'LineLayer' });
-          LineLayer.getL7Layer().source(source.data).color('pink').shape('line').size(6);
-
-          var polygonlayer = new mapboxgl.supermap.L7Layer({ type: 'PolygonLayer' });
-          var l7Layer3 = polygonlayer.getL7Layer();
-
-          l7Layer3.source(source2.data).color('green').shape('fill');
-
-          map.addLayer(layer);
-          // map.addLayer(layer1);
-          // map.addLayer(layer2);
-          // map.addLayer(layer3);
-          // map.addLayer(polygonlayer);
-          // map.addLayer(LineLayer);
+          map.getL7Scene().then(scene=>{
+            scene.on('click', (ev) => {
+              console.log(ev)
+            });
+            createButtons(map, scene)
+          })
+        
         });
     </script>
   </body>

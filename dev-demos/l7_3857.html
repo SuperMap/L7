@@ -7,60 +7,63 @@
 *********************************************************************-->
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>3857</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+      }
+      #map {
+        width: 100%;
+        height: 100%;
+      }
+      #buttons {
+        position: fixed;
+        top:10px;
+        padding:10px;
+        width: 100%;
+        display: flex;
+        flex-flow: wrap;
+        z-index: 111;
+      }
+      #buttons button {
+        display: block;
+        width: 120px;
+        margin: 10px;
+      }
+    </style>
+    <link rel="stylesheet" type="text/css" href="./js/mapbox-gl.css">
+    </link> 
+    <link rel="stylesheet" type="text/css" href="./js/iclient-mapboxgl.css">
+    </link>
+    <script src="https://cdn.jsdelivr.net/npm/@antv/g2@4.2.8/dist/g2.min.js"></script>
+   
+    <script type="text/javascript" src="./js/mapbox-gl-enhance.js"></script>
+    <script type="text/javascript" src="../mapboxgl-l7-render/dist/index.js"></script>
+    <script type="text/javascript" src="./js/iclient-mapboxgl-es6.js"></script>
+  </head>
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>3857</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100vh;
-      overflow: hidden;
-    }
+  <body>
+    <button>clickme</button>
+    <button id="testid">removeAllLayers</button>
+    <div id="buttons"></div>
 
-    #map {
-      width: 100%;
-      height: 100%;
-    }
-
-    #buttons {
-      position: fixed;
-      top: 10px;
-      padding: 10px;
-      width: 100%;
-      display: flex;
-      flex-flow: wrap;
-      z-index: 111;
-    }
-
-    #buttons button {
-      display: block;
-      width: 120px;
-      margin: 10px;
-    }
-  </style>
-  <link rel="stylesheet" type="text/css" href="./js/iclient-mapboxgl.css">
-  </link>
-  <script type="text/javascript" src="./js/mapbox-gl-enhance.js"></script>
-  <script type="text/javascript" src="../mapboxgl-l7-render/dist/index.js"></script>
-  <script type="text/javascript" src="./js/iclient-mapboxgl-es6.js"></script>
-</head>
-
-<body>
-  <button>clickme</button>
-  <button id="testid">修改l7样式</button>
-  <div id="buttons"></div>
-
-  <div id="map"></div>
-  <script type="module">
-   import {createButtons, createMarker, data2} from './js/l7layer.js'
-      const btn = document.querySelector('button');
-      // btn.addEventListener('click', () => {
-      //   map.setZoom(12.1);
-      // });
+    <div id="map"></div>
+    <script type="module">
+      import {createButtons, createMarker, data2} from './js/l7layer.js'
+      const btn = document.querySelector('#testid');
+      btn.addEventListener('click', () => {
+        map.getL7Scene().then(scene=>{
+            scene.removeAllLayer();
+            console.log('removeAllLayer')
+          })
+      });
       var host = window.isLocal ? window.server : 'https://iserver.supermap.io';
       var features = {
         type: 'FeatureCollection',
@@ -78,27 +81,53 @@
           }
         ]
       };
+      const style = {
+        version: 8,
+        sprite: {},
+        glyphs: {},
+        sources: {},
+        layers: [
+          {
+            id: 'ms-background',
+            type: 'background',
+            metadata: {},
+            paint: {
+              'background-color': 'black',
+            },
+          },
+        ],
+      };
+      // const map = new mapboxgl.Map({
+      //   container: 'map',
+      //   style: style,
+      //   crs: 'EPSG:4326',
+      //   center: [116.7034356040623, 40.21562512387371],
+      //   zoom: 2,
+      //   renderWorldCopies: true,
+      // });
+
       mapboxgl.supermap
         .initMap('http://172.16.14.44:8090/iserver/services/map-china400/rest/maps/China', {
-          mapOptions: { center: [100, 10], zoom: 3, pitch: 90,antialias: true , maxZoom: 25}
+          mapOptions: { center: [97.342625,37.373799], zoom: 3, pitch: 0,antialias: true , maxZoom: 25}
         })
         .then(function (result) {
           var map = result.map;    
           // createMarker(map)
-          // createMarker(map, data2)
-          // new mapboxgl.Marker().setLngLat([120.148054, 30.25413]).addTo(map)
-          map.on('click', (ev) => {
-            console.log(ev)
-          });
-          map.getL7Scene().then(scene=>{
-            scene.on('click', (ev) => {
-              console.log(ev)
-            });
-            createButtons(map, scene)
-          })
+          // map.on('load', () => {
+            window.map = map;
+            // new mapboxgl.Marker().setLngLat([120.148054, 30.25413]).addTo(map)
+            // map.on('click', (ev) => {
+            //   console.log(ev)
+            // });
+            map.getL7Scene().then(scene=>{
+              window.scene = scene
+              // scene.on('click', (ev) => {
+              //   console.log(ev)
+              // });
+              createButtons(map, scene)
+            })
         
         });
-  </script>
-</body>
-
+    </script>
+  </body>
 </html>
