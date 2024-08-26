@@ -2,8 +2,8 @@ import { Feature, Properties } from '@turf/helpers';
 import { VectorTile } from '@mapbox/vector-tile';
 import Protobuf from 'pbf';
 import { ITileSource } from '../interface';
-import { toLngLat } from '../../../maps/src/mapbox/utils'
-import { global } from '../../../maps/src/mapbox/mapInstance'
+import { toLngLat } from '@antv/l7-maps/src/utils/mapbox-maplibre-utils'
+import { global } from '@antv/l7-maps/src/utils/mapInstance'
 
 
 export default class VectorSource implements ITileSource {
@@ -14,12 +14,15 @@ export default class VectorSource implements ITileSource {
   private x: number;
   private y: number;
   private z: number;
+  private version?: string;
 
-  constructor(data: ArrayBuffer, x: number, y: number, z: number) {
+  constructor(data: ArrayBuffer, x: number, y: number, z: number, version?:string) {
     this.x = x;
     this.y = y;
     this.z = z;
-    const MultiVectorTile = window.mapboxgl.mapbox.VectorTile;
+    this.version = version;
+    const Map = this.version === 'MAPLIBRE' ? window.maplibregl : window.mapboxgl;
+    const MultiVectorTile = Map.mapbox.VectorTile;
     this.vectorTile = new MultiVectorTile(new Protobuf(data)) as VectorTile;
   }
 

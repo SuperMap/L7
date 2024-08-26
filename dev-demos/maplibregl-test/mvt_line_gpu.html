@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>北京</title>
+    <link rel="stylesheet" type="text/css" href="./maplibre-gl.css">
+</link> 
+<script src="https://cdn.jsdelivr.net/npm/@antv/g2@4.2.8/dist/g2.min.js"></script>
+
+<script type="text/javascript" src="../../maplibregl-l7-render/dist/index.js"></script>
+<script type="text/javascript" src="./maplibre-gl-enhance.js"></script>
+
+<script type="text/javascript" src="./iclient-maplibregl-es6.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #fff;
+            width: 100%;
+            height: 100%
+        }
+
+        #map,
+        #map2 {
+            position: relative;
+            top: 10px;
+            height: 500px;
+            width: 2000px;
+            color: red;
+            border: #ff0 2px solid;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script type="text/javascript">
+
+        const style = {
+            "version": 8,
+            "sprite": {},
+            "glyphs": {},
+            "sources": {},
+            "layers": [
+                {
+                    "id": "ms-background",
+                    "type": "background",
+                    "metadata": {},
+                    "paint": {
+                        "background-color": "#242424"
+                    }
+                }
+            ]
+        }
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: style,
+            crs: 'EPSG:3857',
+            center: [
+            118.23486328124974, 46.271037472802526
+            ],
+            zoom: 2,
+            renderWorldCopies:false,
+        });
+        console.log('L7', L7)
+        map.on('load', () => {
+            window.features = []
+            window.map = map;
+            const urll = "http://172.16.14.44:8090/iserver/services/map-Population-7/restjsr/v1/vectortile/maps/Province_L%40Population1/tiles/{z}/{x}/{y}.mvt";
+            const source = new L7.Source(urll, {
+                parser: {
+                    type: 'mvt',
+                    "extent": [
+                        -180,
+                        -90,
+                        180,
+                        90
+                    ]
+                }
+            });
+            var line = new maplibregl.supermap.L7Layer({
+                type: 'LineLayer',
+                options: { sourceLayer: 'Province_L@Population' },
+            });
+            line.getL7Layer().source(source).shape('line').size([4]).color('red');
+            
+            var features = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        "properties": {}, "id": 147,
+                        geometry: {
+                            type: 'LineString',
+                            "coordinates": [
+                                [118.23486328124974, 46.271037472802526],
+                                [115.86181640624973, 40.59727063442018],
+                                [111.26953124999974, 44.02442151965926],
+                                [111.64306640624976, 46.64943616335017]
+                            ]
+                        },
+                    },
+                ],
+            };
+            const source1 = {
+                type: 'geojson',
+                data: features,
+            };
+            var line1 = new maplibregl.supermap.L7Layer({
+                type: 'LineLayer'
+            });
+            line1.getL7Layer().source(source1.data).shape('line').size(5).color('green');
+            map.addLayer(line1);
+            map.addLayer(line);
+        });
+
+    </script>
+</body>
+
+</html>

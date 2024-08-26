@@ -1,7 +1,7 @@
 import { mat4, vec4 } from 'gl-matrix';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { transformOffset } from '../../../../maps/src/mapbox/utils';
+import { transformOffset } from '@antv/l7-maps/src/utils/mapbox-maplibre-utils';
 import { TYPES } from '../../types';
 import { getDistanceScales } from '../../utils/project';
 import { ICameraService } from '../camera/ICameraService';

@@ -50,6 +50,10 @@ module.exports = [
             replacement: resolveFile('packages/maps/src/$1/index'),
           },
           {
+            find: /^@antv\/l7-maps\/src\/utils\/(.*)/,
+            replacement: resolveFile('packages/maps/src/utils/$1'),
+          },
+          {
             find: /^@antv\/l7-(.*)/,
             replacement: resolveFile('packages/$1/src'),
           },

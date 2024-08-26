@@ -89,11 +89,12 @@ export class TilesetManager extends EventEmitter {
 
   // 更新
   // 1.瓦片序号发生改变 2.瓦片新增 3.瓦片显隐控制
-  public update(zoom: number, latLonBounds: [number, number, number, number], map?: any) {
+  public update(zoom: number, latLonBounds: [number, number, number, number], map?: any, version?:string) {
     // 校验层级，向上取整
     const verifyZoom = Math.max(0, Math.ceil(zoom));
     if(map) {
       this.map = map;
+      this.version = version;
     }
     if (
       this.lastViewStates &&
@@ -139,6 +140,7 @@ export class TilesetManager extends EventEmitter {
             getData: this.options.getTileData,
             onLoad: this.onTileLoad,
             onError: this.onTileError,
+            version: this.version
           });
         }
         return tile;
@@ -171,6 +173,7 @@ export class TilesetManager extends EventEmitter {
         getData: this.options.getTileData,
         onLoad: this.onTileLoad,
         onError: this.onTileError,
+        version: this.version
       });
     }
   }
@@ -183,6 +186,7 @@ export class TilesetManager extends EventEmitter {
         getData: this.options.getTileData,
         onLoad: this.onTileLoad,
         onError: this.onTileError,
+        version: this.version
       });
     }
   }
@@ -379,6 +383,7 @@ export class TilesetManager extends EventEmitter {
       getData: this.options.getTileData,
       onLoad: this.onTileLoad,
       onError: this.onTileError,
+      version: this.version
     });
 
     return tile;

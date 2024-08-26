@@ -1,6 +1,6 @@
-import { CoordinateSystem, IMapCamera, IViewport } from '@antv/l7-core';
+import { IMapCamera, IViewport } from '@antv/l7-core';
 import WebMercatorViewport from '../viewport-mercator-project/web-mercator-viewport';
-import { getCoordinateSystem, isMultiCoor, getEPSGCode } from './utils';
+import { getCoordinateSystem, isMultiCoor, getEPSGCode } from '../utils/mapbox-maplibre-utils';
 
 export default class Viewport implements IViewport {
   public viewport: WebMercatorViewport;

@@ -6,7 +6,7 @@ import { IGeometryLayerStyleOptions } from '../../core/interface';
 import spriteFrag from '../shaders/sprite_frag.glsl';
 import spriteVert from '../shaders/sprite_vert.glsl';
 import { throttle } from 'lodash';
-import { transformOffset } from '../../../../maps/src/mapbox/utils';
+import { transformOffset } from '@antv/l7-maps/src/utils/mapbox-maplibre-utils';
 import { CoordinateSystem } from "../../../../core/src/services/coordinate/ICoordinateSystemService";
 
 enum SPRITE_ANIMATE_DIR {
@@ -54,7 +54,7 @@ export default class SpriteModel extends BaseModel {
         ];
         return [a, b, z, 0, 0];
         
-      } else if (mapService.version === Version['MAPBOX'] && (coordinateSystem === CoordinateSystem.LNGLAT || coordinateSystem === CoordinateSystem.METER_OFFSET)) {
+      } else if (mapService.isMapBoxMapLibre() && (coordinateSystem === CoordinateSystem.LNGLAT || coordinateSystem === CoordinateSystem.METER_OFFSET)) {
         // @ts-ignore
         const [a, b] = transformOffset([x + lng, -y + lat], mapService.map, 512);
         return [a, b, z, 0, 0];

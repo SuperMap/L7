@@ -16,7 +16,7 @@ import { LineArcTriangulation } from '../../core/triangulation';
 import line_arc_frag from '../shaders/line_arc_great_circle_frag.glsl';
 import line_arc2d_vert from '../shaders/line_arc_great_circle_vert.glsl';
 import { interpolate } from '../../../../utils/src/lineAtOffset/greatCircle';
-import { transformOffset } from '../../../../maps/src/mapbox/utils';
+import { transformOffset } from '@antv/l7-maps/src/utils/mapbox-maplibre-utils';
 
 const lineStyleObj: { [key: string]: number } = {
   solid: 0.0,
@@ -143,7 +143,7 @@ export default class GreatCircleModel extends BaseModel {
           vertex: number[],
         ) => {
           const { originCoordinates } = feature;
-          if (originCoordinates && this.mapService.version === 'MAPBOX') {
+          if (originCoordinates && this.mapService?.isMapBoxMapLibre()) {
             const [source, target] = originCoordinates;
             return [source[0], source[1], target[0], target[1]];
           } else {
@@ -182,7 +182,7 @@ export default class GreatCircleModel extends BaseModel {
             a_Position,
             segmentNumber,
           );
-          if (originCoordinates && this.mapService.version === 'MAPBOX') {
+          if (originCoordinates && this.mapService.isMapBoxMapLibre()) {
             const res = this.transformMapboxOffset(currentDegree, nextDegree);
             return res;
           } else {

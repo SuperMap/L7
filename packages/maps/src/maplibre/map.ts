@@ -14,6 +14,8 @@ import { Version } from '../version';
 import Viewport from './Viewport';
 window.maplibregl = maplibregl;
 
+import { setMap } from '../utils/mapInstance'
+
 let mapdivCount = 0;
 const MAPBOX_API_KEY =
   '101MlGsZ2AmmA&access_token=pk.eyJ1IjoiZXhhbXBsZXMiLCJhIjoiY2p0MG01MXRqMW45cjQzb2R6b2ptc3J4MSJ9.zA2W0IkI0c6KaAhJfk9bWg';
@@ -133,6 +135,7 @@ export default class MaplibreService extends BaseMapService<
         ...rest,
       });
     }
+    setMap(this.map);
     this.map.on('load', () => {
       this.handleCameraChanged();
     });
@@ -160,6 +163,13 @@ export default class MaplibreService extends BaseMapService<
   }
 
   public getMapContainer() {
+    return this.$mapContainer;
+  }
+
+  public getMapCanvasContainer() {
+    if (this.$mapContainer) {
+      return this.$mapContainer.getElementsByClassName('maplibregl-canvas-container')[0]
+    }
     return this.$mapContainer;
   }
 

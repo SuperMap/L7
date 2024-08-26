@@ -16,6 +16,7 @@ export class SourceTile extends EventEmitter {
   public x: number;
   public y: number;
   public z: number;
+  public version: string;
   // 循环加载瓦片
   public warp: boolean;
   // 瓦片大小
@@ -48,6 +49,7 @@ export class SourceTile extends EventEmitter {
   private abortController: AbortController;
   // 瓦片序号
   private loadDataId = 0;
+
 
   constructor(options: TileOptions) {
     super();
@@ -130,13 +132,14 @@ export class SourceTile extends EventEmitter {
     this.emit('layerLoaded');
   }
   // 请求瓦片数据
-  public async loadData({ getData, onLoad, onError }: TileLoadDataOptions) {
+  public async loadData({ getData, onLoad, onError, version }: TileLoadDataOptions) {
     this.loadDataId++;
     const loadDataId = this.loadDataId;
     // 如果重复请求，执行最新请求
     if (this.isLoading) {
       this.abortLoad();
     }
+    this.version = version;
 
     this.abortController = new AbortController();
     this.loadStatus = LoadTileDataStatus.Loading;

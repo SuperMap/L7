@@ -10,7 +10,7 @@ import { mat2, vec2 } from 'gl-matrix';
 import {
   transformLnglat,
   transformOffset,
-} from '../../../../maps/src/mapbox/utils';
+} from '@antv/l7-maps/src/utils/mapbox-maplibre-utils';
 import BaseModel from '../../core/BaseModel';
 import { IHeatMapLayerStyleOptions } from '../../core/interface';
 import { PointExtrudeTriangulation } from '../../core/triangulation';

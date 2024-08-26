@@ -20,7 +20,7 @@ import { inject, injectable } from 'inversify';
 import { cloneDeep } from 'lodash';
 import { Map } from 'mapbox-gl';
 import 'reflect-metadata';
-import { isMultiCoor, transformOffset } from '../../../maps/src/mapbox/utils';
+import { isMultiCoor, transformOffset } from '@antv/l7-maps/src/utils/mapbox-maplibre-utils';
 import { ILineLayerStyleOptions } from '../core/interface';
 
 @injectable()
@@ -242,10 +242,10 @@ export default class DataMappingPlugin implements ILayerPlugin {
   private adjustData2MapboxCoordinates(mappedData: IEncodeFeature[]) {
     if (
       mappedData.length > 0 &&
-      this.mapService.version === Version['MAPBOX']
+      this.mapService?.isMapBoxMapLibre()
     ) {
       mappedData.map((d) => {
-        d.version = Version['MAPBOX'];
+        d.version = this.mapService.version;
         if (!d.originCoordinates) {
           // @ts-ignore
           d.originCoordinates = cloneDeep(d.coordinates);
@@ -306,7 +306,7 @@ export default class DataMappingPlugin implements ILayerPlugin {
   }
 
   private getIsMultiCoor() {
-    if (this.mapService.version !== Version['MAPBOX']) {
+    if (!this.mapService.isMapBoxMapLibre()) {
       return false;
     }
     return isMultiCoor(this.mapService.map);

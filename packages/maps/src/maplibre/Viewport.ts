@@ -1,15 +1,17 @@
 import { IMapCamera, IViewport } from '@antv/l7-core';
-// @ts-ignore
 import WebMercatorViewport from '../viewport-mercator-project/web-mercator-viewport';
+import { getCoordinateSystem, isMultiCoor, getEPSGCode } from '../utils/mapbox-maplibre-utils';
+
 export default class Viewport implements IViewport {
   public viewport: WebMercatorViewport;
+  private map: any;
 
   public syncWithMapCamera(mapCamera: Partial<IMapCamera>) {
-    const { center, zoom, pitch, bearing, viewportHeight, viewportWidth } =
+    const { center, zoom, pitch, bearing, viewportHeight, viewportWidth, map } =
       mapCamera;
-
+    this.map = map;
     /**
-     * Deck.gl 使用的也是 Maplibre 同步相机，相机参数保持一致
+     * Deck.gl 使用的也是 Mapbox 同步相机，相机参数保持一致
      * 例如相机高度固定为 height * 1.5，因此不需要传
      */
     
@@ -21,6 +23,10 @@ export default class Viewport implements IViewport {
       zoom,
       pitch,
       bearing,
+      isGeographicCoordinateSystem: isMultiCoor(map),
+      coordinateSystem: getCoordinateSystem(map),
+      epsgCode: getEPSGCode(map),
+      map
     });
   }
 
@@ -69,6 +75,6 @@ export default class Viewport implements IViewport {
     lngLat: [number, number],
     scale?: number | undefined,
   ): [number, number] {
-    return this.viewport.projectFlat(lngLat, scale);
+    return this.viewport.projectFlat(lngLat, scale, isMultiCoor(this.map), this.map);
   }
 }

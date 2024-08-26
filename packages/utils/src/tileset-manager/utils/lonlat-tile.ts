@@ -1,6 +1,6 @@
 import { DEFAULT_EXTENT } from '../const';
 import { TileBounds } from '../types';
-import { getTileXY, getTileBounds } from '../.../../../../../maps/src/mapbox/utils'
+import { getTileXY, getTileBounds } from '@antv/l7-maps/src/utils/mapbox-maplibre-utils'
 
 // // https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#ECMAScript_.28JavaScript.2FActionScript.2C_etc..29
 export function osmLonLat2TileXY(lon: number, lat: number, zoom: number) {

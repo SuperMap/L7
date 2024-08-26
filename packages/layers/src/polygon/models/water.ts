@@ -77,7 +77,7 @@ export default class WaterModel extends BaseModel {
           attributeIdx: number,
         ) => {
           const v =
-            (feature.version === Version['GAODE2.x'] || feature.version === Version['MAPBOX'])
+            (feature.version === Version['GAODE2.x'] || feature.version === Version['MAPBOX'] || feature.version === Version['MAPLIBRE'])
               ? feature.originCoordinates[0][attributeIdx]
               : vertex;
           const [lng, lat] = v;

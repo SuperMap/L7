@@ -1,0 +1,339 @@
+<!--********************************************************************
+* Copyright© 2000 - 2023 SuperMap Software Co.Ltd. All rights reserved.
+*********************************************************************-->
+<!--********************************************************************
+* 该示例需要引入 
+* G6 (https://github.com/antvis/G6)
+*********************************************************************-->
+<!DOCTYPE html>
+<html>
+<link>
+<meta charset="utf-8" />
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>4214</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  #map {
+    width: 100%;
+    height: 100%;
+  }
+
+  #buttons {
+    position: fixed;
+    top: 10px;
+    padding: 10px;
+    width: 100%;
+    display: flex;
+    flex-flow: wrap
+  }
+
+  #buttons button {
+    display: block;
+    width: 120px;
+    margin: 10px;
+  }
+</style>
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/@antv/g2@4.2.8/dist/g2.min.js"></script> -->
+<link rel="stylesheet" type="text/css" href="./maplibre-gl.css">
+</link> 
+<script src="https://cdn.jsdelivr.net/npm/@antv/g2@4.2.8/dist/g2.min.js"></script>
+
+<script type="text/javascript" src="../../maplibregl-l7-render/dist/index.js"></script>
+<script type="text/javascript" src="./maplibre-gl-enhance.js"></script>
+
+<script type="text/javascript" src="./iclient-maplibregl-es6.js"></script>
+</head>
+
+<body>
+  <div id="map"></div>
+  <div id="buttons"></div>
+  <script type="text/javascript">
+    var WKT = 'PROJCS["Xian 1980 / 3-degree Gauss-Kruger zone 38",GEOGCS["Xian 1980",DATUM["Xian_1980",SPHEROID["IAG 1975",6378140,298.257,AUTHORITY["EPSG","7049"]],AUTHORITY["EPSG","6610"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4610"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",114],PARAMETER["scale_factor",1],PARAMETER["false_easting",38500000],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","2362"]]'
+    var map = new maplibregl.Map({
+      container: 'map', // container id
+      style: {
+        version: 8,
+        sources: {
+        },
+
+        layers: [
+        ]
+      },
+      crs: 'EPSG:4214',
+      center: [108.85, 23.85],
+      zoom: 15
+    });
+
+    window.map = map;
+    var data = [
+      {
+        w: 23.85,
+        t: 24.6,
+        s: '海南',
+        l: 11,
+        m: '东方',
+        j: 108.85,
+        h: 59838,
+        v: 2,
+        mag: 8.4,
+        value: 1,
+        name: '01',
+        "capacity": 67200,
+        "name": "金元坊",
+        "icon": "icon1"
+      }
+    ];
+    map.on('load', () => {
+      window.map = map;
+      var layer = new maplibregl.supermap.L7Layer({ type: 'PointLayer' });
+      var l7Layer = layer.getL7Layer();
+      data.forEach((item) => {
+        const { j: lng, w: lat } = item;
+        new maplibregl.Marker().setLngLat([lng, lat]).addTo(map);
+    });
+      l7Layer
+        .source(data, {
+          parser: {
+            type: 'json',
+            x: 'j',
+            y: 'w'
+          }
+        })
+        .shape('circle')
+        .size(10)
+        .color('red');
+
+
+      map.getL7Scene().then(scene => {
+        console.log('--------------')
+        createShpePoint(data, map)
+      })
+
+      l7Layer.on('click', (e) => {
+        console.log('layer: ', e)
+      });
+
+    });
+
+    function createShpePoint(data, map) {
+      var layer = new maplibregl.supermap.L7Layer({ type: 'PointLayer' });
+      var l7Layer = layer.getL7Layer();
+      l7Layer.source(data, {
+        parser: {
+          type: 'json',
+          x: 'j',
+          y: 'w'
+        }
+      })
+        .shape('circle')
+        .size(10)
+        .color('name', ['#5B8FF9', '#5CCEA1', '#5D7092', '#F6BD16', '#E86452'])
+        .style({
+          opacity: 0.8,
+          strokeWidth: 2
+        });
+      map.addLayer(layer);
+    }
+  function creategrid(data, map) {
+  var layer = new maplibregl.supermap.L7Layer({ type: 'HeatmapLayer' });
+  var l7Layer = layer.getL7Layer();
+  l7Layer
+    .source(data, {
+      parser: {
+        type: 'json',
+        x: 'j',
+        y: 'w',
+      },
+      transforms: [
+        {
+          type: 'grid',
+          size: 20,
+          field: 'v',
+          method: 'sum',
+        },
+      ],
+    })
+    .shape('hexagon')
+    .style({
+      coverage: 1,
+      angle: 0,
+    })
+    .color('red');
+  map.addLayer(layer);
+}
+function createGridMap(map) {
+  fetch('./3dadb1f5-8f54-4449-8206-72db6e142c40.json')
+    .then((res) => res.json())
+    .then((data) => {
+      var linelayer = new maplibregl.supermap.L7Layer({
+        type: 'HeatmapLayer',
+        options: { autoFit: true },
+      });
+      linelayer
+        .getL7Layer()
+        .source(data, {
+          transforms: [
+            {
+              type: 'hexagon',
+              size: 5 * 100000,
+            },
+          ],
+        })
+        .shape('circle')
+        .active(false)
+        .color('#aaa')
+        .style({
+          coverage: 0.7,
+          angle: 0,
+        });
+      map.addLayer(linelayer);
+    });
+}
+function createHeatMapColumn(data, map) {
+  fetch('./513add53-dcb2-4295-8860-9e7aa5236699.json')
+    .then((res) => res.json())
+    .then(() => {
+      var layer = new maplibregl.supermap.L7Layer({ type: 'HeatmapLayer' });
+      var l7Layer = layer.getL7Layer();
+      l7Layer
+        .source(data, {
+          parser: {
+        type: 'json',
+        x: 'j',
+        y: 'w',
+      },
+          transforms: [
+            {
+              type: 'hexagon',
+              size: 1000,
+              field: 'v',
+              method: 'sum',
+            },
+          ],
+        })
+        .size('sum', [0, 600])
+        .shape('hexagonColumn')
+        .style({
+          coverage: 0.8,
+          angle: 0,
+        })
+        .color(
+          'sum',
+          [
+            '#094D4A',
+            '#146968',
+            '#1D7F7E',
+            '#289899',
+            '#34B6B7',
+            '#4AC5AF',
+            '#5FD3A6',
+            '#7BE39E',
+            '#A1EDB8',
+            '#CEF8D6',
+          ].reverse(),
+        );
+      map.addLayer(layer);
+    });
+}
+function creategrid3D(data, map) {
+  var layer = new maplibregl.supermap.L7Layer({ type: 'HeatmapLayer' });
+  var l7Layer = layer.getL7Layer();
+  l7Layer
+    .source(data, {
+      parser: {
+        type: 'json',
+        x: 'j',
+        y: 'w',
+      },
+      transforms: [
+        {
+          type: 'hexagon',
+          size: 250,
+          field: 'v',
+          method: 'sum',
+        },
+      ],
+    })
+    .size('sum', [0, 600])
+    .shape('hexagonColumn')
+    .style({
+      coverage: 0.8,
+      angle: 0,
+    })
+    .color('sum', [
+      '#094D4A',
+      '#146968',
+      '#1D7F7E',
+      '#289899',
+      '#34B6B7',
+      '#4AC5AF',
+      '#5FD3A6',
+      '#7BE39E',
+      '#A1EDB8',
+      '#C3F9CC',
+      '#DEFAC0',
+      '#ECFFB1',
+    ]);
+  map.addLayer(layer);
+}
+function createCircleArc(map) {
+  fetch('./UEXQMifxtkQlYfChpPwT.txt')
+    .then((res) => res.text())
+    .then((data) => {
+      var layer = new maplibregl.supermap.L7Layer({ type: 'LineLayer' });
+      var l7Layer = layer.getL7Layer();
+      l7Layer
+        .source(data, {
+          parser: {
+            type: 'csv',
+            x: 'lng1',
+            y: 'lat1',
+            x1: 'lng2',
+            y1: 'lat2',
+          },
+        })
+        .size(1)
+        .shape('greatcircle')
+        .color('#8C1EB2')
+        .style({
+          opacity: 0.8,
+        });
+      map.addLayer(layer);
+    });
+}
+// var center = [108.85, 23.85];
+
+    // var zoom = 18;
+    // // 2362
+    // var extent = [32876993.777095847, -10001970.421227315, 52880934.61955048, 10001970.421227315];
+    // <!-- var WKT = 'PROJCS["Xian 1980 / 3-degree Gauss-Krugesr zone 38",GEOGCS["Xian 1980",DATUM["Xian_1980",SPHEROID["IAG 1975",6378140,298.257,AUTHORITY["EPSG","7049"]],AUTHORITY["EPSG","6610"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4610"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",114],PARAMETER["scale_factor",1],PARAMETER["false_easting",38500000],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","2362"]]' -->
+    // // 3857 
+    // // var extent = [-20037508.3427892, -20037508.3427892, 20037508.3427892, 20037508.3427892]
+    // // var WKT = 'PROJCS["Xian 1980 / 3-degree Gauss-Kruger zone 38",GEOGCS["Xian 1980",DATUM["Xian_1980",SPHEROID["IAG 1975",6378140,298.257,AUTHORITY["EPSG","7049"]],AUTHORITY["EPSG","6610"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4610"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",114],PARAMETER["scale_factor",1],PARAMETER["false_easting",38500000],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","2362"]]'
+    // // var crs = new maplibregl.CRS('EPSG:3857', extent);
+    // //2412
+    // // var extent = [36408674.58, 3874638.91, 36683463.94, 4320467.53]
+    // // var WKT = 'PROJCS["Beijing 1954 / 3-degree Gauss-Kruger zone 36",GEOGCS["Beijing 1954",DATUM["Beijing_1954",SPHEROID["Krassowsky 1940",6378245,298.3],TOWGS84[11.911,-154.833,-80.079,0,0,0,0]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4214"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",108],PARAMETER["scale_factor",1],PARAMETER["false_easting",36500000],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","2412"]]'
+    
+    // var crs = new maplibregl.CRS('EPSG:2362', WKT, [32876993.777095847, -10001970.421227315, 52880934.61955048, 10001970.421227315]);
+    // var width = Math.max(extent[2] - extent[0], extent[3] - extent[1]);
+    // var res0 = width / 512;
+    // var reszoom = res0 / Math.pow(2, zoom);
+    // var center_p = crs.fromWGS84(center);
+    // var center_512_x = (center_p[0] - extent[0]) / width * 512;
+    // console.log(center_512_x)
+
+
+
+  </script>
+</body>
+
+</html>

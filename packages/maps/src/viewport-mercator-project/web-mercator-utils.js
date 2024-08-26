@@ -5,7 +5,7 @@ import { createMat4, transformVector } from './math-utils';
 import * as mat4 from 'gl-matrix/mat4';
 import * as vec2 from 'gl-matrix/vec2';
 import * as vec3 from 'gl-matrix/vec3';
-import { transformToMultiCoor } from '../mapbox/utils';
+import { transformToMultiCoor } from '../utils/mapbox-maplibre-utils';
 import assert from './assert';
 import { CoordinateSystem } from "../../../core/src/services/coordinate/ICoordinateSystemService";
 

@@ -44,7 +44,7 @@ const getVectorTile = async (
           if (err || !data) {
             resolve(undefined);
           } else {
-            const vectorSource = new VectorSource(data, tile.x, tile.y, tile.z);
+            const vectorSource = new VectorSource(data, tile.x, tile.y, tile.z, tile.version);
             resolve(vectorSource);
           }
         },
@@ -59,7 +59,7 @@ const getVectorTile = async (
           if (err || !data) {
             resolve(undefined);
           } else {
-            const vectorSource = new VectorSource(data, tile.x, tile.y, tile.z);
+            const vectorSource = new VectorSource(data, tile.x, tile.y, tile.z, tile.version);
             resolve(vectorSource);
           }
         },

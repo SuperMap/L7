@@ -52,6 +52,7 @@ interface ISimpleMapCoord {
 export interface IMapService<RawMap = {}> {
   coordinateSystemService: any;
   version?: string;
+  isMapBoxMapLibre: ()=> boolean;
   simpleMapCoord: ISimpleMapCoord;
   map: RawMap;
   bgColor: string;

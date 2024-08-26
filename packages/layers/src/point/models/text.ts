@@ -424,7 +424,7 @@ export default class TextModel extends BaseModel {
 
       // 此时地图高德2.0 originCentroid == centroid
       feature.originCentroid =
-        (feature.version === 'GAODE2.x' || feature.version === 'MAPBOX')
+        (feature.version === 'GAODE2.x' || feature.version === 'MAPBOX' || feature.version === 'MAPLIBRE')
           ? calculateCentroid(feature.originCoordinates)
           : (feature.originCentroid = feature.centroid);
 
@@ -470,7 +470,7 @@ export default class TextModel extends BaseModel {
       // const centroid = feature.centroid as [number, number];
       // const centroid = feature.originCentroid as [number, number];
       const centroid = (
-        (feature.version === 'GAODE2.x' || feature.version === 'MAPBOX')
+        (feature.version === 'GAODE2.x' || feature.version === 'MAPBOX' || feature.version === 'MAPLIBRE')
           ? feature.originCentroid
           : feature.centroid
       ) as [number, number];

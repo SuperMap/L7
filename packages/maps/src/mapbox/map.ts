@@ -13,7 +13,7 @@ import BaseMapService from '../utils/BaseMapService';
 import { Version } from '../version';
 import Viewport from './Viewport';
 window.mapboxgl = mapboxgl;
-import { setMap } from './mapInstance'
+import { setMap } from '../utils/mapInstance'
 
 let mapdivCount = 0;
 const MAPBOX_API_KEY =

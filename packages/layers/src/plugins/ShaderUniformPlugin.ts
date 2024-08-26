@@ -13,7 +13,7 @@ import { Version } from '@antv/l7-maps';
 import { $window } from '@antv/l7-utils';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { isMultiCoor } from '../../../maps/src/mapbox/utils';
+import { isMultiCoor } from '@antv/l7-maps/src/utils/mapbox-maplibre-utils';
 
 /**
  * 在渲染之前需要获取当前 Shader 所需 Uniform，例如：
@@ -141,7 +141,7 @@ export default class ShaderUniformPlugin implements ILayerPlugin {
     }
   }
   private getIsMultiCoor() {
-    if (this.mapService.version !== Version['MAPBOX']) {
+    if (!this.mapService.isMapBoxMapLibre()) {
       return false;
     }
     return isMultiCoor(this.mapService.map);

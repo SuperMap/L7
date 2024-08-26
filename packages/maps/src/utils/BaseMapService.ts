@@ -26,7 +26,7 @@ import 'reflect-metadata';
 import { Version } from '../version';
 import { ISimpleMapCoord, SimpleMapCoord } from './simpleMapCoord';
 import { MapTheme } from './theme';
-import { getCoordinateSystem, getEPSGCode } from '../mapbox/utils';
+import { getCoordinateSystem, getEPSGCode } from './mapbox-maplibre-utils';
 const EventMap: {
   [key: string]: any;
 } = {
@@ -168,6 +168,9 @@ export default abstract class BaseMapService<T>
   }
   public setPitch(pitch: number) {
     return this.map.setPitch(pitch);
+  }
+  public isMapBoxMapLibre() {
+    return this.version === Version['MAPLIBRE'] || this.version === Version['MAPBOX']
   }
 
   public panTo(p: [number, number]): void {
